@@ -1,5 +1,6 @@
 # Module that defines the GUI elements of FlashCards
 import tkinter as tk
+import json
 
 class MainApp:
     def __init__(self, parent, name = None):
@@ -32,18 +33,28 @@ class MainApp:
 
         if current_screen == -1:
             print("No previous screen, no screen unpacked.")
+        
+        self.set_callbacks()
     
-    # B
+    def set_callbacks(self):
+        def handle_intro_callbacks(event, self = self):
+            if self.current_screen == 0:
+                self.update_current_screen(1, self.current_screen)
+                print("Any key pressed")
+
+        self.main_window.bind("<Any-Key>", handle_intro_callbacks) # Will trigger while any frame is up - perform check in callback method
+
+    # Builds all the screens/widgets but does not place them onto the main_window
     def initalise_screens(self):
         self.build_intro_screen()
         self.build_topic_select_screen()
 
     def build_intro_screen(self):
-        self.intro_label = tk.Label(master = self.intro_frame, text = "intro label")
-        self.intro_label.grid(column = 0, row = 0)
+        f = open("gui_reference.json")
+        data = json.load(f)
 
-        self.scene_change_button = tk.Button(master = self.intro_frame, text = "Next scene", command = lambda: self.update_current_screen(1, self.current_screen))
-        self.scene_change_button.grid(column = 1, row = 0)
+        self.intro_label = tk.Label(master = self.intro_frame, text = data["intro_frame"][0]["main_text"])
+        self.intro_label.grid(column = 0, row = 0)
 
     def build_topic_select_screen(self):
         self.top_label = tk.Label(master = self.topic_select_frame, text = "Choose a topic: ")
@@ -54,6 +65,10 @@ class MainApp:
 
 if __name__ == "__main__":
     main_window = tk.Tk()
+    main_window.title("FlashCards! - The best way to study-")
+    main_window.geometry("800x600")
+    main_window.resizable(False, False)
+
     app = MainApp(main_window)
 
     main_window.mainloop()
