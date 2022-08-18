@@ -56,12 +56,14 @@ class MainApp:
         self.intro_label = tk.Label(master = self.intro_frame, text = data["intro_frame"][0]["main_text"])
         self.intro_label.grid(column = 0, row = 0)
 
+
+
     def build_topic_select_screen(self):
         self.top_label = tk.Label(master = self.topic_select_frame, text = "Choose a topic: ")
-        self.top_label.grid(column = 0, row = 0)
+        self.top_label.grid(column = 0, row = 1)
 
         self.back_to_start_button = tk.Button(master = self.topic_select_frame, text = "Back to intro!", command = lambda: self.update_current_screen(0, self.current_screen))
-        self.back_to_start_button.grid(column = 0, row = 1)
+        self.back_to_start_button.grid(column = 0, row = 0)
 
 if __name__ == "__main__":
     main_window = tk.Tk()
