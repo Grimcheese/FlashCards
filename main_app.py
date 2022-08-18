@@ -2,6 +2,8 @@
 import tkinter as tk
 import json
 
+from handle_json import JSONHandler
+
 class MainApp:
     def __init__(self, parent, name = None):
         self.main_window = parent
