@@ -34,30 +34,21 @@ class TopicSelectFrame(BasicFrame):
 
         self.top_label = None
         self.topic_buttons = []
+        self.chosen_topic_labels = []
         self.next_screen_button = None
         self.back_to_start_button = None
+
+        self.chosen_topics = []
 
         self.build_topic_select_screen(main_app)
 
     def build_topic_select_screen(self, main_app):
-        topic_file = JSONTopicHandler("topic.json")
-        print("Topics in file: ")
-        topic_file.topic_string()
-
+        topic_row = self.make_topic_buttons()
+        
         self.top_label = tk.Label(master = self.base_frame, text = "Topics from file: ")
         self.top_label.grid(column = 0, row = 1)
 
-        topic_row = 1
-        for topic in topic_file.topics:
-            self.topic_buttons.append(tk.Button(master = self.base_frame, 
-                                            text = topic, 
-                                            justify = tk.LEFT, 
-                                            wraplength = 145,
-                                            width = 20))
-            self.topic_buttons[topic_row - 1].grid(column = 1, row = topic_row, sticky = tk.W)
-            topic_row += 1
-        
-        self.next_screen_button = tk.Button(master = self.base_frame, text = "Run prompts",
+        self.next_screen_button = tk.Button(master = self.base_frame, text = "Run prompts from selected topic",
                                                 command = lambda: self.start_prompts(main_app))
         self.next_screen_button.grid(column = 0, row = topic_row + 1)
 
@@ -65,6 +56,50 @@ class TopicSelectFrame(BasicFrame):
                                                 text = "Back to intro!", 
                                                 command = lambda: main_app.update_current_screen(0, main_app.current_screen))
         self.back_to_start_button.grid(column = 0, row = 0)
+
+    def make_topic_buttons(self):
+        topic_file = JSONTopicHandler("topic.json")
+        print("Topics in file: ")
+        topic_file.topic_string()
+        
+        topic_row = 1
+        for topic in topic_file.topics:
+            self.topic_buttons.append(tk.Button(master = self.base_frame, 
+                                            text = topic, 
+                                            justify = tk.LEFT, 
+                                            wraplength = 145,
+                                            width = 20,
+                                            command = lambda topic = topic: self.pick_topics(topic, topic_file)))
+            
+            self.chosen_topic_labels.append(tk.Label(master = self.base_frame, text = ""))
+
+            self.topic_buttons[topic_row - 1].grid(column = 1, row = topic_row, sticky = tk.W)
+            self.chosen_topic_labels[topic_row - 1].grid(column = 2, row = topic_row)
+            topic_row += 1
+
+        return topic_row
+
+    def pick_topics(self, topic, topic_file):
+        i = 0
+        print("You have selected: " + topic)
+        for element in topic_file.topics:
+            if element == topic:
+                break
+            else:
+                i = i + 1
+        
+        if topic in self.chosen_topics:
+            index = self.chosen_topics.index(topic)
+            del self.chosen_topics[index]
+            self.chosen_topic_labels[i].config(text = "")
+        else:
+            self.chosen_topics.append(topic)
+            self.chosen_topic_labels[i].config(text = "Picked")
+
+        print(self.chosen_topics)
+
+
+        
 
     def start_prompts(self, main_app):
         main_app.update_current_screen(2, main_app.current_screen)
@@ -128,6 +163,7 @@ class MainApp:
                 print("Any key pressed")
 
         self.main_window.bind("<Any-Key>", handle_intro_callbacks) # Will trigger while any frame is up - perform check in callback method
+        self.main_window.bind("<Any-Button>", handle_intro_callbacks)
 
     
 
