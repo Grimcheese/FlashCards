@@ -5,13 +5,19 @@ import json
 from handle_json import JSONHandler
 from handle_json import JSONTopicHandler
 
+class IntroFrame():
+    def __init__(self, parent):
+        self.intro_frame = tk.Frame(master = parent)
+
 class MainApp:
     def __init__(self, parent, name = None):
         self.main_window = parent
         self.current_screen = 0
 
-        self.intro_frame = tk.Frame(master = self.main_window)
+        self.intro_frame = IntroFrame(self.main_window)
+
         self.topic_select_frame = tk.Frame(master = self.main_window)
+        self.run_prompts_frame = tk.Frame(master = self.main_window)
 
         self.initalise_screens()
         self.update_current_screen(0)
@@ -25,6 +31,8 @@ class MainApp:
             self.intro_frame.grid_remove()
         elif current_screen == 1:
             self.topic_select_frame.grid_remove()
+        elif current_screen == 2:
+            self.run_prompts_frame.grid_remove()
 
         # Builds the next frame
         if new_screen == 0:
@@ -32,6 +40,9 @@ class MainApp:
             self.current_screen = new_screen
         elif new_screen == 1:
             self.topic_select_frame.grid()
+            self.current_screen = new_screen
+        elif new_screen == 2:
+            self.run_prompts_frame.grid()
             self.current_screen = new_screen
 
         if current_screen == -1:
@@ -51,6 +62,7 @@ class MainApp:
     def initalise_screens(self):
         self.build_intro_screen()
         self.build_topic_select_screen()
+        self.build_run_prompts_screen()
 
     def build_intro_screen(self):
         gui_reference_data = JSONHandler.get_js("gui_reference.json")
@@ -67,13 +79,35 @@ class MainApp:
         self.top_label.grid(column = 0, row = 1)
 
         topic_row = 1
+        topic_label = []
         for topic in topic_file.topics:
-            self.topic_label = tk.Label(master = self.topic_select_frame, text = topic)
-            self.topic_label.grid(column = 1, row = topic_row)
+            topic_label.append(tk.Button(master = self.topic_select_frame, 
+                                            text = topic, 
+                                            justify = tk.LEFT, 
+                                            wraplength = 145,
+                                            width = 20,
+                                            command = ))
+            topic_label[topic_row - 1].grid(column = 1, row = topic_row, sticky = tk.W)
             topic_row += 1
+        
+        next_screen_button = tk.Button(master = self.topic_select_frame, text = "Run prompts",
+                                            command = lambda: self.start_prompts())
+        next_screen_button.grid(column = 0, row = topic_row + 1)
 
-        self.back_to_start_button = tk.Button(master = self.topic_select_frame, text = "Back to intro!", command = lambda: self.update_current_screen(0, self.current_screen))
+        self.back_to_start_button = tk.Button(master = self.topic_select_frame, 
+                                                text = "Back to intro!", 
+                                                command = lambda: self.update_current_screen(0, self.current_screen))
         self.back_to_start_button.grid(column = 0, row = 0)
+    
+    def build_run_prompts_screen(self):
+        run_prompts = tk.Label(master = self.run_prompts_frame, text = "Running through prompts!")
+        run_prompts.grid(row = 0, column = 0)
+
+    def start_prompts(self, topic):
+
+
+        self.update_current_screen(2, self.current_screen)
+
 
 if __name__ == "__main__":
     main_window = tk.Tk()
