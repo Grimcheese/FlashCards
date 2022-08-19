@@ -62,5 +62,19 @@ class JSONTopicHandler(JSONHandler):
             topics.append(topic["topic_name"])
         
         return topics
+    
+class JSONPromptHandler(JSONHandler):
+    def __init__(self, fname, topics):
+        super().__init__(fname)
 
+        self.prompt_pairs = self.get_pairs(topics)
+
+    def get_pairs(self, topics):
+        prompt_pairs = []
+        for topic in topics:
+            for i in range(len(self.raw_string)):
+                if self.raw_string[i]["topic_name"] == topic:
+                    prompt_pairs.append(self.raw_string[i]["prompts"])
+                    
+        return prompt_pairs
 

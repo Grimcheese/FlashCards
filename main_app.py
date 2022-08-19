@@ -129,7 +129,7 @@ class MainApp:
 
         self.set_callbacks()
 
-    # Will change the current screen that is display.
+    # Will change the current screen that is displayed on the main_window.
     # WARNING - If no current_screen is entered (no argument passed) no screen will be unpacked
     def update_current_screen(self, new_screen, current_screen = -1):
         # Unpack/destroy current frame in prep for building next frame
@@ -145,7 +145,7 @@ class MainApp:
         if new_screen == 0:
             self.intro_frame.show()
             self.current_screen = new_screen
-            self.clear_vals()
+            self.clear_instance()
         elif new_screen == 1:
             self.topic_select_frame.show()
             self.current_screen = new_screen
@@ -156,7 +156,7 @@ class MainApp:
         if current_screen == -1:
             print("No previous screen, no screen unpacked.")
 
-    def clear_vals(self):
+    def clear_instance(self):
         self.topic_select_frame = TopicSelectFrame(self.main_window, self)
         self.display_prompts_frame = DisplayPrompts(self.main_window, self)
     
