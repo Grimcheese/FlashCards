@@ -1,0 +1,38 @@
+[
+    {
+
+        "topic_name": "Ports",
+        "prompts": [
+            {
+                "prompt": "What is the port number for FTP?",
+                "answer": "20 for the data port and 21 for control"
+            },
+            {
+                "prompt": "What is the port number for HTTP?",
+                "answer": "TCP/UDP Port 80"
+            },
+            {
+                "prompt": "What is the port number for SSH?",
+                "answer": "TCP Port 22"
+            }
+        ]
+    },
+    {
+        "topic_name": "WiFi_Standards",
+        "prompts": [
+            {
+                "prompt": "What frequency does 802.11a use?",
+                "answer": "5GHz"
+            }
+        ]
+    },
+    {
+        "topic_name": "Connectors",
+        "prompts": [
+            {
+                "prompt": "What is a reversible USB connector type: USB2, USB-C",
+                "answer": "USB-C"
+            }
+        ]
+    }
+]

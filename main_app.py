@@ -3,6 +3,7 @@ import tkinter as tk
 import json
 
 from handle_json import JSONHandler
+from handle_json import JSONTopicHandler
 
 class MainApp:
     def __init__(self, parent, name = None):
@@ -52,17 +53,24 @@ class MainApp:
         self.build_topic_select_screen()
 
     def build_intro_screen(self):
-        f = open("gui_reference.json")
-        data = json.load(f)
+        gui_reference_data = JSONHandler.get_js("gui_reference.json")
 
-        self.intro_label = tk.Label(master = self.intro_frame, text = data["intro_frame"][0]["main_text"])
+        self.intro_label = tk.Label(master = self.intro_frame, text = gui_reference_data["intro_frame"][0]["main_text"])
         self.intro_label.grid(column = 0, row = 0)
 
-
-
     def build_topic_select_screen(self):
-        self.top_label = tk.Label(master = self.topic_select_frame, text = "Choose a topic: ")
+        topic_file = JSONTopicHandler("topic.json")
+        print("Topics in file: ")
+        topic_file.topic_string()
+
+        self.top_label = tk.Label(master = self.topic_select_frame, text = "Topics from file: ")
         self.top_label.grid(column = 0, row = 1)
+
+        topic_row = 1
+        for topic in topic_file.topics:
+            self.topic_label = tk.Label(master = self.topic_select_frame, text = topic)
+            self.topic_label.grid(column = 1, row = topic_row)
+            topic_row += 1
 
         self.back_to_start_button = tk.Button(master = self.topic_select_frame, text = "Back to intro!", command = lambda: self.update_current_screen(0, self.current_screen))
         self.back_to_start_button.grid(column = 0, row = 0)

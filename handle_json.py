@@ -9,11 +9,30 @@ class InvalidKeyError(Exception):
 
 class JSONHandler():
     def __init__(self, filename):
-        self.fname = f
+        self.fname = filename
         self.raw_string = JSONHandler.get_js(self.fname)
-        self.prompts = self.extract_prompts()
+
+    @classmethod
+    def get_js(cls, fname):
+        f = open(fname)
+        data = json.load(f)
+
+        return data
+
+class JSONTopicHandler(JSONHandler):
+
+    def __init__(self, filename):
+        super().__init__(filename)
+
+        self.topics = self.extract_topics()
+        self.prompts = []
+
+    def topic_string(self):
+        for topic in self.topics:
+            print(topic)
 
     # Gets a value from the key/value pair as specified
+    # Must specify "prompt" or "answer"
     def get_value(self, index, key):
         try:
             if key == "prompt" or key == "answer":
@@ -28,32 +47,20 @@ class JSONHandler():
     
     # Generate random numbers within range of length
     def randomise_prompts(self):
-        temp_prompts = prompts
+        temp_prompts = self.prompts
         random_prompts = []
         while len(temp_prompts) > 0:
-            rnum = randint(0, len(temp_prompts) - 1)
+            rnum = random.randint(0, len(temp_prompts) - 1)
             random_prompts.append(temp_prompts[rnum])
             del temp_prompts[rnum]
 
         return random_prompts
 
+    def extract_topics(self):
+        topics = []
+        for topic in self.raw_string:
+            topics.append(topic["topic_name"])
         
+        return topics
 
 
-
-    # Returns all the prompts from the JSON file as a tuple.
-    # prompt_pairs[prompt][answer]
-    def extract_prompts(self):
-        prompts = []
-        for prompt_pair in self.raw_string["prompts"]:
-            prompts.append(prompt_pair)
-
-        return prompts
-
-    
-    @classmethod
-    def get_js(cls, fname):
-        f = open(fname)
-        data = json.load(f)
-
-        return data
