@@ -49,7 +49,7 @@ class TopicSelectFrame(BasicFrame):
         self.top_label.grid(column = 0, row = 1)
 
         self.next_screen_button = tk.Button(master = self.base_frame, text = "Run prompts from selected topic",
-                                                command = lambda: self.start_prompts(main_app))
+                                                command = lambda: main_app.start_prompts())
         self.next_screen_button.grid(column = 0, row = topic_row + 1)
 
         self.back_to_start_button = tk.Button(master = self.base_frame, 
@@ -98,23 +98,22 @@ class TopicSelectFrame(BasicFrame):
 
         print(self.chosen_topics)
 
-
-        
-
-    def start_prompts(self, main_app):
-        main_app.update_current_screen(2, main_app.current_screen)
-
 class DisplayPrompts(BasicFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, main_app):
         super().__init__(parent)
 
         self.top_label = None
+        self.return_to_start_button = None
 
-        self.build_run_prompts_screen()
+        self.build_run_prompts_screen(main_app)
 
-    def build_run_prompts_screen(self):
+    def build_run_prompts_screen(self, main_app):
+        self.return_to_start_button = tk.Button(master = self.base_frame, text = "Return to start screen", 
+                                                    command = lambda: main_app.update_current_screen(0, main_app.current_screen))
+        self.return_to_start_button.grid(column = 0, row = 0)
+
         self.top_label = tk.Label(master = self.base_frame, text = "Running through prompts!")
-        self.top_label.grid(row = 0, column = 0)
+        self.top_label.grid(column = 1, row = 0)
 
 
 class MainApp:
@@ -124,7 +123,7 @@ class MainApp:
 
         self.intro_frame = IntroFrame(self.main_window)
         self.topic_select_frame = TopicSelectFrame(self.main_window, self)
-        self.display_prompts_frame = DisplayPrompts(self.main_window)        
+        self.display_prompts_frame = DisplayPrompts(self.main_window, self)        
 
         self.update_current_screen(0)
 
@@ -146,6 +145,7 @@ class MainApp:
         if new_screen == 0:
             self.intro_frame.show()
             self.current_screen = new_screen
+            self.clear_vals()
         elif new_screen == 1:
             self.topic_select_frame.show()
             self.current_screen = new_screen
@@ -155,6 +155,10 @@ class MainApp:
 
         if current_screen == -1:
             print("No previous screen, no screen unpacked.")
+
+    def clear_vals(self):
+        self.topic_select_frame = TopicSelectFrame(self.main_window, self)
+        self.display_prompts_frame = DisplayPrompts(self.main_window, self)
     
     def set_callbacks(self):
         def handle_intro_callbacks(event, self = self):
@@ -164,6 +168,9 @@ class MainApp:
 
         self.main_window.bind("<Any-Key>", handle_intro_callbacks) # Will trigger while any frame is up - perform check in callback method
         self.main_window.bind("<Any-Button>", handle_intro_callbacks)
+
+    def start_prompts(self):
+        self.update_current_screen(2, self.current_screen)
 
     
 

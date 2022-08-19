@@ -34,5 +34,14 @@
                 "answer": "USB-C"
             }
         ]
+    },
+    {
+        "topic_name": "Virtual Machines",
+        "prompts": [
+            {
+                "prompt": "What technology does an AMD processor need to support running a VM?",
+                "answer": "AMD-V"
+            }
+        ]
     }
 ]
