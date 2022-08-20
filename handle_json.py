@@ -12,6 +12,10 @@ class JSONHandler():
         self.fname = filename
         self.raw_string = JSONHandler.get_js(self.fname)
 
+    def output_string(self):
+        print(self.raw_string)
+        print("String loaded from JSON file: " + self.fname)
+
     @classmethod
     def get_js(cls, fname):
         f = open(fname)
@@ -25,18 +29,56 @@ class JSONTopicHandler(JSONHandler):
         super().__init__(filename)
 
         self.topics = self.extract_topics()
-        self.prompts = []
+        self.chosen_topics = []
+        self.all_prompts = []
+
+    def set_topic(self, in_topic):
+        modified = False
+        if in_topic not in self.chosen_topics: 
+            for element in self.topics:
+                if in_topic == element:
+                    self.chosen_topics.append(in_topic)
+                    print(in_topic + " added to chosen topics.")
+                    modified = True
+        else:
+            index = self.chosen_topics.index(in_topic)
+            del self.chosen_topics[index]
+            print(in_topic + " removed from chosen topics.")
+            modified = True
+        
+        if not modified:
+            print("'" + in_topic + "' is an invalid topic string")
+    
+    def prompts_from_chosen_topics(self):
+        self.all_prompts = []
+        for topic in self.chosen_topics:
+            self.prompts_from_topic(topic)
+
+        return self.all_prompts
+    
+    def prompts_from_topic(self, search_topic):
+        for topics in self.raw_string:
+            if topics["topic_name"] == search_topic:
+                #found topic
+                for prompt in topics["prompts"]:
+                    self.all_prompts.append(prompt)
+
 
     def topic_string(self):
+        print("Topics found in file: ")
         for topic in self.topics:
-            print(topic)
+            print("    " + topic)
+        
+        print("Topics chosen: ")
+        for topic in self.chosen_topics:
+            print("    " + topic)
 
     # Gets a value from the key/value pair as specified
     # Must specify "prompt" or "answer"
     def get_value(self, index, key):
         try:
             if key == "prompt" or key == "answer":
-                return self.prompts[index][key]
+                return self.all_prompts[index][key]
             else:
                 raise InvalidKeyError(key)
         except InvalidKeyError:
@@ -62,19 +104,36 @@ class JSONTopicHandler(JSONHandler):
             topics.append(topic["topic_name"])
         
         return topics
+
+def run_module_tests():
+    json_data = JSONHandler("topic.json")
+    json_data.output_string()
+
+    json_data = JSONTopicHandler("topic.json")
+    json_data.output_string()
+
+    json_data.set_topic("Ports")
+    json_data.set_topic("Ports")
+    json_data.set_topic("blah")
+    json_data.topic_string()
+
+    json_data.set_topic("Ports")
+    json_data.set_topic("Connectors")
+    prompts = json_data.prompts_from_chosen_topics()
+
+    print(prompts)
+    print("Cycling through all prompts and answers from chosen topic/s!")
+    for prompt in prompts:
+        print("Prompt: " + prompt["prompt"])
+        print("Answer: " + prompt["answer"])
+        print("")
+
+    print("get_value test")
+    for i in range(len(prompts)):
+        print("Prompt: " + json_data.get_value(i, "prompt"))
+        print("Answer: " + json_data.get_value(i, "answer"))
+
+if __name__ == "__main__":
+    run_module_tests()
     
-class JSONPromptHandler(JSONHandler):
-    def __init__(self, fname, topics):
-        super().__init__(fname)
-
-        self.prompt_pairs = self.get_pairs(topics)
-
-    def get_pairs(self, topics):
-        prompt_pairs = []
-        for topic in topics:
-            for i in range(len(self.raw_string)):
-                if self.raw_string[i]["topic_name"] == topic:
-                    prompt_pairs.append(self.raw_string[i]["prompts"])
-                    
-        return prompt_pairs
 
