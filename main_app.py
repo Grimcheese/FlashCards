@@ -123,9 +123,12 @@ class DisplayPrompts(BasicFrame):
         self.return_to_start_button = tk.Button(master = self.base_frame, text = "Return to start screen", 
                                                     command = lambda: main_app.update_current_screen(0, main_app.current_screen))
         self.return_to_start_button.grid(column = 0, row = 0)
+        self.return_to_topic_select_button = tk.Button(master = self.base_frame, text = "Return to topic select",
+                                                        command = lambda: main_app.update_current_screen(1, main_app.current_screen))
+        self.return_to_topic_select_button.grid(column = 1, row = 0)
 
         self.top_label = tk.Label(master = self.base_frame, text = "Running through prompts!")
-        self.top_label.grid(column = 1, row = 0)
+        self.top_label.grid(column = 2, row = 0)
 
         self.prompt_label = tk.Label(master = self.base_frame, text = "")
         self.prompt_label.grid(column = 2, row = 2)
@@ -133,14 +136,18 @@ class DisplayPrompts(BasicFrame):
         self.answer_label.grid(column = 2, row = 3)
 
     def next(self):
-        if self.showing_prompt:
-            self.answer_label.config(text = self.topic_file.get_value(self.prompt_index, "answer"))
-            self.showing_prompt = False
-            self.prompt_index += 1
+        if self.prompt_index < self.topic_file.number_of_prompts():
+            if self.showing_prompt:
+                self.answer_label.config(text = self.topic_file.get_value(self.prompt_index, "answer"))
+                self.showing_prompt = False
+                self.prompt_index += 1
+            else:
+                self.answer_label.config(text = "")
+                self.prompt_label.config(text = self.topic_file.get_value(self.prompt_index, "prompt"))
+                self.showing_prompt = True
         else:
+            self.prompt_label.config(text = "Out of prompts!")
             self.answer_label.config(text = "")
-            self.prompt_label.config(text = self.topic_file.get_value(self.prompt_index, "prompt"))
-            self.showing_prompt = True
 
 
 class MainApp:
