@@ -40,14 +40,19 @@ class JSONTopicHandler(JSONHandler):
                     self.chosen_topics.append(in_topic)
                     print(in_topic + " added to chosen topics.")
                     modified = True
+                    selected = True
         else:
             index = self.chosen_topics.index(in_topic)
             del self.chosen_topics[index]
             print(in_topic + " removed from chosen topics.")
             modified = True
+            selected = False
         
         if not modified:
             print("'" + in_topic + "' is an invalid topic string")
+            selected = False
+        
+        return selected
     
     def prompts_from_chosen_topics(self):
         self.all_prompts = []
@@ -64,14 +69,18 @@ class JSONTopicHandler(JSONHandler):
                     self.all_prompts.append(prompt)
 
 
-    def topic_string(self):
-        print("Topics found in file: ")
-        for topic in self.topics:
-            print("    " + topic)
-        
+    def topic_string(self, modifier = 0):
+        if modifier == 0:
+            print("Topics found in file: ")
+            for topic in self.topics:
+                print("    " + topic)
+            
         print("Topics chosen: ")
         for topic in self.chosen_topics:
             print("    " + topic)
+    
+    def number_of_prompts(self):
+        return len(self.all_prompts)
 
     # Gets a value from the key/value pair as specified
     # Must specify "prompt" or "answer"
