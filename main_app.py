@@ -110,6 +110,12 @@ class DisplayPrompts(BasicFrame):
 
         self.top_label = None
         self.return_to_start_button = None
+        self.return_to_topic_select_button = None
+        self.back_button = None
+
+        self.prompt_label = None
+        self.answer_label = None
+        self.user_answer = None
 
         self.build_run_prompts_screen(main_app)
     
@@ -131,6 +137,10 @@ class DisplayPrompts(BasicFrame):
         self.top_label = tk.Label(master = self.base_frame, text = "Running through prompts!")
         self.top_label.grid(column = 2, row = 0)
 
+        self.back_button = tk.Button(master = self.base_frame, text = "Go back a prompt",
+                                        command = self.back)
+        self.back_button.grid(column = 3, row = 0)
+
         self.prompt_label = tk.Label(master = self.base_frame, text = "", width = 22, wraplength = 100)
         self.prompt_label.grid(column = 2, columnspan = 2, row = 2)
         self.answer_label = tk.Label(master = self.base_frame, text = "")
@@ -138,6 +148,15 @@ class DisplayPrompts(BasicFrame):
 
         self.user_answer = tk.Entry(master = self.base_frame)
         self.user_answer.grid(column = 2, row = 3)
+
+    def back(self):
+        print("Going back to last prompt")
+        print("Current index number: " + str(self.prompt_index))
+        if self.prompt_index > 0:
+            self.prompt_index = self.prompt_index - 1
+            self.prompt_labels_update(self.topic_file.get_value(self.prompt_index, "prompt"),
+                                        self.topic_file.get_value(self.prompt_index, "answer"))
+            
 
     def next(self):
         if self.prompt_index < self.topic_file.number_of_prompts():
@@ -153,6 +172,11 @@ class DisplayPrompts(BasicFrame):
             self.prompt_label.config(text = "Out of prompts! Press Enter to return to start...")
             self.answer_label.config(text = "")
             self.end_of_prompts = True
+    
+    def prompt_labels_update(self, prompt, answer):
+        self.prompt_label.config(text = prompt)
+        self.answer_label.config(text = answer)
+
 
 
 class MainApp:
@@ -205,8 +229,10 @@ class MainApp:
             if self.current_screen == 0:
                 self.update_current_screen(1, self.current_screen)
                 print("Any key pressed")
-            elif self.current_screen == 2 and event.keysym == "Return":
+            elif self.current_screen == 2 and (event.keysym == "Return" or event.keysym == "Right"):
                 next_display_prompt_callback(event, self)
+            elif self.current_screen == 2 and event.keysym == "Left":
+                self.display_prompts_frame.back()
         
         def next_display_prompt_callback(event, self = self):
             if self.current_screen == 2:
@@ -217,7 +243,6 @@ class MainApp:
 
         self.main_window.bind("<Any-Key>", handle_callbacks) # Will trigger while any frame is up - perform check in callback method
         self.main_window.bind("<Any-Button>", handle_callbacks)
-        self.main_window.bind("<Return>", handle_callbacks)
 
 
     def start_prompts(self):
