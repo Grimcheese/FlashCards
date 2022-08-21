@@ -32,7 +32,7 @@ As far as I know, there is no limit to the number of prompts that can be put int
 
 Basically the file consists of a list of dictionaries containing topics and each topic contains another list of dictionaries which contain the prompts and answers for the topic.
 ```json
-[{"topic_name": "First topic", "prompts": [{"prompt": "First prompt", "answer": "First answer"}]}]
+[{"topic_name": "First topic", "prompts": [{"prompt": "First prompt", "answer": "First answer"}]}, {"topic_name": "Second topic", "prompts": [{"prompts": "First prompt", "answer": "First answer"}]}]
 ```
 
 # To do list - future features and ideas
