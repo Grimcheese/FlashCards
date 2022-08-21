@@ -106,6 +106,7 @@ class DisplayPrompts(BasicFrame):
         self.topic_file = file_obj
         self.prompt_index = 0
         self.showing_prompt = False
+        self.end_of_prompts = False
 
         self.top_label = None
         self.return_to_start_button = None
@@ -149,8 +150,9 @@ class DisplayPrompts(BasicFrame):
                 self.prompt_label.config(text = self.topic_file.get_value(self.prompt_index, "prompt"))
                 self.showing_prompt = True
         else:
-            self.prompt_label.config(text = "Out of prompts!")
+            self.prompt_label.config(text = "Out of prompts! Press Enter to return to start...")
             self.answer_label.config(text = "")
+            self.end_of_prompts = True
 
 
 class MainApp:
@@ -208,7 +210,10 @@ class MainApp:
         
         def next_display_prompt_callback(event, self = self):
             if self.current_screen == 2:
-                self.display_prompts_frame.next()
+                if self.display_prompts_frame.end_of_prompts is False:
+                    self.display_prompts_frame.next()
+                else:
+                    self.update_current_screen(0, self.current_screen)
 
         self.main_window.bind("<Any-Key>", handle_callbacks) # Will trigger while any frame is up - perform check in callback method
         self.main_window.bind("<Any-Button>", handle_callbacks)
