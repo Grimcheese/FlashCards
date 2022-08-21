@@ -127,10 +127,13 @@ class DisplayPrompts(BasicFrame):
         self.top_label = tk.Label(master = self.base_frame, text = "Running through prompts!")
         self.top_label.grid(column = 1, row = 0)
 
-        self.prompt_label = tk.Label(master = self.base_frame, text = "")
-        self.prompt_label.grid(column = 2, row = 2)
+        self.prompt_label = tk.Label(master = self.base_frame, text = "", width = 22, wraplength = 100)
+        self.prompt_label.grid(column = 2, columnspan = 2, row = 2)
         self.answer_label = tk.Label(master = self.base_frame, text = "")
-        self.answer_label.grid(column = 2, row = 3)
+        self.answer_label.grid(column = 3, row = 3)
+
+        self.user_answer = tk.Entry(master = self.base_frame)
+        self.user_answer.grid(column = 2, row = 3)
 
     def next(self):
         if self.showing_prompt:
