@@ -9,7 +9,7 @@ Once the topic(s) have been selected the user will be prompted with a random que
 # To do list - future features and ideas
 * File selection
 
- Currently only supports reading from a single file that is located in the same directory as main_app.py. The file must be called "topic.json".
+   Currently only supports reading from a single file that is located in the same directory as main_app.py. The file must be called "topic.json".
 * User input checking
 
- Answer checking could be included and would take simple input (eg, one or two word answers, single numbers, match single words from a sentence).
+   Answer checking could be included and would take simple input (eg, one or two word answers, single numbers, match single words from a sentence).
