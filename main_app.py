@@ -29,7 +29,7 @@ class IntroFrame(BasicFrame):
         self.intro_label.grid(column = 0, row = 0)
 
 class TopicSelectFrame(BasicFrame):
-    def __init__(self, parent, main_app):
+    def __init__(self, parent, main_app, in_file):
         super().__init__(parent)
 
         self.top_label = None
@@ -38,27 +38,27 @@ class TopicSelectFrame(BasicFrame):
         self.next_screen_button = None
         self.back_to_start_button = None
 
-        self.topic_file = JSONTopicHandler("topic.json")
+        self.topic_file = in_file
         
         self.chosen_topics = []
 
         self.build_topic_select_screen(main_app)
 
     def build_topic_select_screen(self, main_app):
-        topic_row = self.make_topic_buttons()
-        
         self.top_label = tk.Label(master = self.base_frame, text = "Topics from file: ")
         self.top_label.grid(column = 0, row = 1)
 
         self.next_screen_button = tk.Button(master = self.base_frame, text = "Run prompts from selected topic",
                                                 command = lambda: main_app.start_prompts(),
                                                 state = tk.DISABLED)
-        self.next_screen_button.grid(column = 0, row = topic_row + 1)
 
         self.back_to_start_button = tk.Button(master = self.base_frame, 
                                                 text = "Back to intro!", 
                                                 command = lambda: main_app.update_current_screen(0, main_app.current_screen))
         self.back_to_start_button.grid(column = 0, row = 0)
+        
+        topic_row = self.make_topic_buttons()
+        self.next_screen_button.grid(column = 0, row = topic_row + 1)
 
     def make_topic_buttons(self):
         topic_row = 1
@@ -71,6 +71,7 @@ class TopicSelectFrame(BasicFrame):
                                             command = lambda topic = topic: self.pick_topics(topic)))
             
             self.chosen_topic_labels.append(tk.Label(master = self.base_frame, text = ""))
+            self.update_picked_topics_label(topic)
 
             self.topic_buttons[topic_row - 1].grid(column = 1, row = topic_row, sticky = tk.W)
             self.chosen_topic_labels[topic_row - 1].grid(column = 2, row = topic_row)
@@ -78,16 +79,19 @@ class TopicSelectFrame(BasicFrame):
 
         return topic_row
 
-    def pick_topics(self, topic):
-        print("You have selected: " + topic)
+    def pick_topics(self, selected_topic):
+        print("You have selected: " + selected_topic)
+        self.topic_file.set_topic(selected_topic)
 
-        i = self.topic_file.topics.index(topic)
-        selected = self.topic_file.set_topic(topic)
+        self.update_picked_topics_label(selected_topic)
 
-        if selected:
-            self.chosen_topic_labels[i].config(text = "Picked")
+    def update_picked_topics_label(self, selected_topic):
+        topic_label_index = self.topic_file.topics.index(selected_topic)
+        is_selected = self.topic_file.topic_is_selected(selected_topic)
+        if is_selected:
+            self.chosen_topic_labels[topic_label_index].config(text = "Picked")
         else:
-            self.chosen_topic_labels[i].config(text = "")
+            self.chosen_topic_labels[topic_label_index].config(text = "")
         
         if len(self.topic_file.chosen_topics) == 0:
             print("Next screen button disabled")
@@ -96,7 +100,6 @@ class TopicSelectFrame(BasicFrame):
             print("Next screen button activated")
             self.next_screen_button.config(state = tk.ACTIVE)
         
-
         self.topic_file.topic_string(1)
 
 class DisplayPrompts(BasicFrame):
@@ -177,6 +180,12 @@ class DisplayPrompts(BasicFrame):
         self.prompt_label.config(text = prompt)
         self.answer_label.config(text = answer)
 
+    def remove(self):
+        self.prompt_index = 0
+        self.showing_prompt = False
+        self.prompt_labels_update("", "")
+        super().remove()
+
 
 
 class MainApp:
@@ -184,9 +193,11 @@ class MainApp:
         self.main_window = parent
         self.current_screen = 0
 
+        self.topic_file = JSONTopicHandler("topic.json")
+
         self.intro_frame = IntroFrame(self.main_window)
-        self.topic_select_frame = TopicSelectFrame(self.main_window, self)
-        self.display_prompts_frame = DisplayPrompts(self.main_window, self, self.topic_select_frame.topic_file)        
+        self.topic_select_frame = TopicSelectFrame(self.main_window, self, self.topic_file)
+        self.display_prompts_frame = DisplayPrompts(self.main_window, self, self.topic_file)        
 
         self.update_current_screen(0)
 
@@ -221,8 +232,13 @@ class MainApp:
             print("No previous screen, no screen unpacked.")
 
     def clear_instance(self):
-        self.topic_select_frame = TopicSelectFrame(self.main_window, self)
-        self.display_prompts_frame = DisplayPrompts(self.main_window, self, self.topic_select_frame.topic_file)
+        del self.topic_select_frame
+        del self.display_prompts_frame
+        del self.topic_file
+
+        self.topic_file = JSONTopicHandler("topic.json")
+        self.topic_select_frame = TopicSelectFrame(self.main_window, self, self.topic_file)
+        self.display_prompts_frame = DisplayPrompts(self.main_window, self, self.topic_file)
     
     def set_callbacks(self):
         def handle_callbacks(event, self = self):
@@ -246,6 +262,7 @@ class MainApp:
 
 
     def start_prompts(self):
+        self.topic_file.randomise_prompts()
         self.update_current_screen(2, self.current_screen)
 
     

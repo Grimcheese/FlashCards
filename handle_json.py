@@ -40,19 +40,20 @@ class JSONTopicHandler(JSONHandler):
                     self.chosen_topics.append(in_topic)
                     print(in_topic + " added to chosen topics.")
                     modified = True
-                    selected = True
         else:
             index = self.chosen_topics.index(in_topic)
             del self.chosen_topics[index]
             print(in_topic + " removed from chosen topics.")
             modified = True
-            selected = False
         
         if not modified:
             print("'" + in_topic + "' is an invalid topic string")
-            selected = False
-        
-        return selected
+    
+    def topic_is_selected(self, check_topic):
+        if check_topic in self.chosen_topics:
+            return True
+        else:
+            return False
     
     def prompts_from_chosen_topics(self):
         self.all_prompts = []
@@ -78,6 +79,12 @@ class JSONTopicHandler(JSONHandler):
         print("Topics chosen: ")
         for topic in self.chosen_topics:
             print("    " + topic)
+
+    def print_prompts(self):
+        for i in range(self.number_of_prompts()):
+            print("Prompt: " + self.get_value(i, "prompt"))
+            print("Answer: " + self.get_value(i, "answer"))
+
     
     def number_of_prompts(self):
         return len(self.all_prompts)
@@ -98,13 +105,15 @@ class JSONTopicHandler(JSONHandler):
     
     # Generate random numbers within range of length
     def randomise_prompts(self):
-        temp_prompts = self.prompts
+        print("Randomising all_prompts")
+        temp_prompts = self.all_prompts
         random_prompts = []
         while len(temp_prompts) > 0:
             rnum = random.randint(0, len(temp_prompts) - 1)
             random_prompts.append(temp_prompts[rnum])
             del temp_prompts[rnum]
 
+        self.all_prompts = random_prompts
         return random_prompts
 
     def extract_topics(self):
@@ -138,10 +147,14 @@ def run_module_tests():
         print("")
 
     print("get_value test")
-    for i in range(len(prompts)):
-        print("Prompt: " + json_data.get_value(i, "prompt"))
-        print("Answer: " + json_data.get_value(i, "answer"))
+    json_data.print_prompts()
+        
 
+    print("Randomiser test")
+    json_data.randomise_prompts()
+    json_data.print_prompts()
+
+# If ran as a python script begin running tests that output to console
 if __name__ == "__main__":
     run_module_tests()
     
