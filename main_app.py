@@ -47,7 +47,7 @@ class TopicSelectFrame(BasicFrame):
         self.top_label = tk.Label(master = self.base_frame, text = "Topics from file: ")
         self.top_label.grid(column = 0, row = 1)
 
-        self.next_screen_button = tk.Button(master = self.base_frame, text = "Run prompts from selected topic",
+        self.next_screen_button = tk.Button(master = self.base_frame, text = "Run prompts from selected topic/s",
                                                 command = lambda: main_app.start_prompts(),
                                                 state = tk.DISABLED)
 
@@ -106,7 +106,7 @@ class DisplayPrompts(BasicFrame):
         super().__init__(parent)
 
         self.topic_file = file_obj
-        self.prompt_index = 0
+        self.prompt_index = -1
         self.showing_prompt = False
         self.end_of_prompts = False
 
@@ -152,43 +152,63 @@ class DisplayPrompts(BasicFrame):
         self.user_answer.grid(column = 2, row = 3)
 
     def back(self):
-        print("Going back to last prompt")
-        print("Current index number: " + str(self.prompt_index))
         if self.prompt_index > 0:
             self.prompt_index = self.prompt_index - 1
             self.prompt_labels_update(self.topic_file.get_value(self.prompt_index, "prompt"),
                                         self.topic_file.get_value(self.prompt_index, "answer"))
+            self.showing_prompt = False
+            self.end_of_prompts = False
             
+            print("Going back to last prompt")
+            print("Current index number: " + str(self.prompt_index))
 
+# Not happy with current implementation of this method. On the last prompt the index needs to be incremented 
+# after showing the answer. Every other prompt requires index to be incremented before the prompt.
+# Needs work
     def next(self):
-        if self.prompt_index < self.topic_file.number_of_prompts():
+        if self.prompt_index == (self.topic_file.number_of_prompts() - 1): #On final prompt do:
             if self.showing_prompt:
-                self.answer_label.config(text = self.topic_file.get_value(self.prompt_index, "answer"))
+                self.prompt_labels_update(answer = self.topic_file.get_value(self.prompt_index, "answer"))
                 self.showing_prompt = False
-                self.prompt_index += 1
+                self.prompt_index = self.prompt_index + 1                
             else:
-                self.answer_label.config(text = "")
-                self.prompt_label.config(text = self.topic_file.get_value(self.prompt_index, "prompt"))
+                self.prompt_labels_update(prompt = self.topic_file.get_value(self.prompt_index, "prompt"),
+                                            answer = "")
+                self.showing_prompt = True
+        elif self.prompt_index < self.topic_file.number_of_prompts():
+            if self.showing_prompt:
+                self.prompt_labels_update(answer = self.topic_file.get_value(self.prompt_index, "answer"))
+                self.showing_prompt = False
+                
+            else:
+                self.prompt_index = self.prompt_index + 1
+                self.prompt_labels_update(prompt = self.topic_file.get_value(self.prompt_index, "prompt"),
+                                            answer = "")
                 self.showing_prompt = True
         else:
-            self.prompt_label.config(text = "Out of prompts! Press Enter to return to start...")
-            self.answer_label.config(text = "")
+            self.prompt_labels_update(prompt = "Out of prompts! Press Enter to return to start...",
+                                        answer = "")
             self.end_of_prompts = True
 
-        print(self.prompt_index)
+        print("Going forward")
+        print("Current index number: " + str(self.prompt_index))
     
-    def prompt_labels_update(self, prompt, answer):
-        self.prompt_label.config(text = prompt)
-        self.answer_label.config(text = answer)
+    def prompt_labels_update(self, prompt = None, answer = None):
+        if prompt is not None:
+            self.prompt_label.config(text = prompt)
+        if answer is not None:
+            self.answer_label.config(text = answer)
 
     def show(self):
         self.topic_file.prompts_from_chosen_topics()
         self.topic_file.randomise_prompts()
 
+        self.topic_file.print_prompts()
+
         super().show()
 
     def remove(self):
-        self.prompt_index = 0
+        self.prompt_index = -1
         self.showing_prompt = False
         self.prompt_labels_update("", "")
         
