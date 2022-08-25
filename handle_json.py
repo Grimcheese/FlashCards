@@ -98,10 +98,7 @@ class JSONTopicHandler(JSONHandler):
             else:
                 raise InvalidKeyError(key)
         except InvalidKeyError:
-            return "Invalid Key"
-        except IndexError:
-            print("Index out of bounds error")
-            return "IndexError"
+            return "InvalidKeyError"
     
     # Generate random numbers within range of length
     def randomise_prompts(self):
@@ -153,6 +150,11 @@ def run_module_tests():
     print("Randomiser test")
     json_data.randomise_prompts()
     json_data.print_prompts()
+
+    try:
+        json_data.get_value(20, "prompt")
+    except IndexError:
+        print("There was an exception raised in the method")
 
 # If ran as a python script begin running tests that output to console
 if __name__ == "__main__":
