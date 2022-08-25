@@ -106,14 +106,15 @@ class DisplayPrompts(BasicFrame):
         super().__init__(parent)
 
         self.topic_file = file_obj
-        self.prompt_index = -1
-        self.showing_prompt = False
+        self.prompt_index = 0
+        self.showing_answer = False
         self.end_of_prompts = False
 
         self.top_label = None
         self.return_to_start_button = None
         self.return_to_topic_select_button = None
         self.back_button = None
+        self.start_prompts = None
 
         self.prompt_label = None
         self.answer_label = None
@@ -140,7 +141,7 @@ class DisplayPrompts(BasicFrame):
         self.top_label.grid(column = 2, row = 0)
 
         self.back_button = tk.Button(master = self.base_frame, text = "Go back a prompt",
-                                        command = self.back)
+                                        command = self.previous_prompt)
         self.back_button.grid(column = 3, row = 0)
 
         self.prompt_label = tk.Label(master = self.base_frame, text = "", width = 22, wraplength = 100)
@@ -148,56 +149,59 @@ class DisplayPrompts(BasicFrame):
         self.answer_label = tk.Label(master = self.base_frame, text = "")
         self.answer_label.grid(column = 3, row = 3)
 
+        self.start_prompts_button = tk.Button(master = self.base_frame, text = "Begin running through prompts",
+                                        command = self.start_prompts_button_command)
+        self.start_prompts_button.grid(column = 4, row = 0)
+
         self.user_answer = tk.Entry(master = self.base_frame)
         self.user_answer.grid(column = 2, row = 3)
 
-    def back(self):
+    def start_prompts_button_command(self):
+        self.prompt_labels_update(self.topic_file.get_value(self.prompt_index, "prompt"))
+        self.start_prompts_button.grid_remove()
+        self.start_prompts_button.config(state = tk.DISABLED)
+
+    def previous_prompt(self):
         if self.prompt_index > 0:
             self.prompt_index = self.prompt_index - 1
             self.prompt_labels_update(self.topic_file.get_value(self.prompt_index, "prompt"),
                                         self.topic_file.get_value(self.prompt_index, "answer"))
-            self.showing_prompt = False
             self.end_of_prompts = False
             
             print("Going back to last prompt")
             print("Current index number: " + str(self.prompt_index))
 
-# Not happy with current implementation of this method. On the last prompt the index needs to be incremented 
-# after showing the answer. Every other prompt requires index to be incremented before the prompt.
-# Needs work
-    def next(self):
-        if self.prompt_index == (self.topic_file.number_of_prompts() - 1): #On final prompt do:
-            if self.showing_prompt:
-                self.prompt_labels_update(answer = self.topic_file.get_value(self.prompt_index, "answer"))
-                self.showing_prompt = False
-                self.prompt_index = self.prompt_index + 1                
+    def goto_next_prompt(self):
+        print("Current index: " + str(self.prompt_index))
+        try:
+            if self.showing_answer:
+                print("Updating prompt label")
+                self.next_prompt()
             else:
-                self.prompt_labels_update(prompt = self.topic_file.get_value(self.prompt_index, "prompt"),
-                                            answer = "")
-                self.showing_prompt = True
-        elif self.prompt_index < self.topic_file.number_of_prompts():
-            if self.showing_prompt:
+                print("Updating answer label ")
                 self.prompt_labels_update(answer = self.topic_file.get_value(self.prompt_index, "answer"))
-                self.showing_prompt = False
-                
-            else:
-                self.prompt_index = self.prompt_index + 1
-                self.prompt_labels_update(prompt = self.topic_file.get_value(self.prompt_index, "prompt"),
-                                            answer = "")
-                self.showing_prompt = True
-        else:
-            self.prompt_labels_update(prompt = "Out of prompts! Press Enter to return to start...",
-                                        answer = "")
+        except IndexError:
+            self.prompt_labels_update(prompt = "Out of prompts! Press Enter to return to start...", answer = "")
             self.end_of_prompts = True
 
-        print("Going forward")
-        print("Current index number: " + str(self.prompt_index))
-    
+
+    def next_prompt(self):
+        self.prompt_index = self.prompt_index + 1
+        self.prompt_labels_update(prompt = self.topic_file.get_value(self.prompt_index, "prompt"),
+                                    answer = "")
+            
+
     def prompt_labels_update(self, prompt = None, answer = None):
         if prompt is not None:
             self.prompt_label.config(text = prompt)
         if answer is not None:
             self.answer_label.config(text = answer)
+            if answer is "":
+                self.showing_answer = False
+                print("Not showing answer")
+            else:
+                self.showing_answer = True
+                print("Showing answer")
 
     def show(self):
         self.topic_file.prompts_from_chosen_topics()
@@ -208,13 +212,11 @@ class DisplayPrompts(BasicFrame):
         super().show()
 
     def remove(self):
-        self.prompt_index = -1
+        self.prompt_index = 0
         self.showing_prompt = False
         self.prompt_labels_update("", "")
         
         super().remove()
-
-
 
 class MainApp:
     def __init__(self, parent, name = None):
@@ -275,12 +277,12 @@ class MainApp:
             elif self.current_screen == 2 and (event.keysym == "Return" or event.keysym == "Right"):
                 next_display_prompt_callback(event, self)
             elif self.current_screen == 2 and event.keysym == "Left":
-                self.display_prompts_frame.back()
+                self.display_prompts_frame.previous_prompt()
         
         def next_display_prompt_callback(event, self = self):
             if self.current_screen == 2:
                 if self.display_prompts_frame.end_of_prompts is False:
-                    self.display_prompts_frame.next()
+                    self.display_prompts_frame.goto_next_prompt()
                 else:
                     self.update_current_screen(0, self.current_screen)
 
