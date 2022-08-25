@@ -1,6 +1,5 @@
 # Module that defines the GUI elements of FlashCards
 import tkinter as tk
-import json
 
 from handle_json import JSONHandler
 from handle_json import JSONTopicHandler
@@ -175,15 +174,24 @@ class DisplayPrompts(BasicFrame):
             self.prompt_label.config(text = "Out of prompts! Press Enter to return to start...")
             self.answer_label.config(text = "")
             self.end_of_prompts = True
+
+        print(self.prompt_index)
     
     def prompt_labels_update(self, prompt, answer):
         self.prompt_label.config(text = prompt)
         self.answer_label.config(text = answer)
 
+    def show(self):
+        self.topic_file.prompts_from_chosen_topics()
+        self.topic_file.randomise_prompts()
+
+        super().show()
+
     def remove(self):
         self.prompt_index = 0
         self.showing_prompt = False
         self.prompt_labels_update("", "")
+        
         super().remove()
 
 
@@ -225,7 +233,6 @@ class MainApp:
             self.current_screen = new_screen
         elif new_screen == 2:
             self.display_prompts_frame.show()
-            self.display_prompts_frame.topic_file.prompts_from_chosen_topics()
             self.current_screen = new_screen
 
         if current_screen == -1:
@@ -262,7 +269,6 @@ class MainApp:
 
 
     def start_prompts(self):
-        self.topic_file.randomise_prompts()
         self.update_current_screen(2, self.current_screen)
 
     
