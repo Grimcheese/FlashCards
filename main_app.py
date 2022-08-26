@@ -1,8 +1,11 @@
 # Module that defines the GUI elements of FlashCards
 import tkinter as tk
+import json
 
 from handle_json import JSONHandler
 from handle_json import JSONTopicHandler
+
+from pathlib import Path
 
 class BasicFrame():
     def __init__(self, parent):
@@ -34,53 +37,65 @@ class ChooseFileFrame(BasicFrame):
         super().__init__(main_app.main_window)
 
         self.chosen_file = None
+
+        self.found_files = []
+        self.files_display = []
+
         self.main_label = None
+        self.previous_frame_button = None
+        self.next_frame_button = None
 
-        self.file_name_entry = None
+        self.build_choose_file_frame(main_app)
 
-        self.build_choose_file(main_app)
-
-    def build_choose_file(self, main_app):
-        self.screen_labels()
+    def build_choose_file_frame(self, main_app):
+        self.main_label = tk.Label(master = self.base_frame, text = "Choose file to read topics/prompts from: ")
+        self.main_label.grid(column = 0, row = 1)
 
         self.previous_frame_button = tk.Button(master = self.base_frame, text = "Go back.",
             command = lambda: main_app.update_current_screen(main_app.intro_frame.S_INDEX, main_app.current_screen))
         self.previous_frame_button.grid(column = 0, row = 0)
         self.next_frame_button = tk.Button(master = self.base_frame, text = "Choose: '" + main_app.topic_file.get_name() + "'",
-            command = lambda: main_app.update_current_screen(main_app.topic_select_frame.S_INDEX, main_app.current_screen))
+            command = lambda: self.to_topic_select(main_app))
         self.next_frame_button.grid(column = 1, row = 0)
         
-        self.file_name_entry = tk.Entry(master = self.base_frame)
-        self.file_name_entry.grid(column = 1, row = 1)
+        self.show_files()
 
-        self.file_name_button = tk.Button(master = self.base_frame, text = "Pick selected file.", 
-                    command = self.search_for_file)
-        self.file_name_button.grid(column = 2, row = 1)
+    def to_topic_select(self, main_app):
+        if self.chosen_file is not None:
+            main_app.topic_file = self.chosen_file
+        main_app.topic_select_frame = TopicSelectFrame(main_app)
+        main_app.update_current_screen(main_app.topic_select_frame.S_INDEX, main_app.current_screen)
 
-    def screen_labels(self):
-        self.main_label = tk.Label(master = self.base_frame, text = "Choose file to read topics/prompts from: ")
-        self.main_label.grid(column = 0, row = 1)
+    def show_files(self):
+        rsrc_dir = Path(MainApp.CWD, MainApp.RESOURCES_DIR)
+        
+        file_index = 0
+        for file in rsrc_dir.iterdir():
+            # Check each file supports FlashCards format
+            try:
+                self.found_files.append(JSONTopicHandler(file))
+                self.found_files.append(file)
+                file_name = Path(file).name
+                self.files_display.append(tk.Button(master = self.base_frame, text = file_name,
+                        command = lambda file = file: self.pick_file(file)))
+                self.files_display[file_index].grid(column = 3, row = file_index + 2)
 
-    def search_for_file(self):
-        file_name = ChooseFileFrame.get_file_name_input(self.file_name_entry.get())
-        if file_name is not None:
-            self.chosen_file = JSONTopicHandler(file_name)
-            self.next_frame_button.config(state = tk.ACTIVE)
-        else:
-            self.main_label.config(text = "Invalid name. Try again: ")
+                file_index += 1
+            except json.decoder.JSONDecodeError:
+                print("Not a valid FlashCards file")
 
-# Gets a file name from the user's input. If the input is invalid, returns None
-    @classmethod
-    def get_file_name_input(cls, in_file_name):
-        if in_file_name:
-            return None
+    def pick_file(self, f_path):
+        new_file = JSONTopicHandler(f_path)
+        self.chosen_file = new_file
+        print("Picking file: " + new_file.get_name())
 
-        return None
+        self.next_frame_button.config(text = "Choose: '" + new_file.get_name() + "'")
+
 
 class TopicSelectFrame(BasicFrame):
     S_INDEX = "topic_select_frame"
-    def __init__(self, parent, main_app, in_file):
-        super().__init__(parent)
+    def __init__(self, main_app):
+        super().__init__(main_app.main_window)
 
         self.top_label = None
         self.topic_buttons = []
@@ -88,7 +103,7 @@ class TopicSelectFrame(BasicFrame):
         self.next_screen_button = None
         self.previous_frame_button = None
 
-        self.topic_file = in_file
+        self.topic_file = main_app.topic_file
         
         self.chosen_topics = []
 
@@ -99,7 +114,7 @@ class TopicSelectFrame(BasicFrame):
         self.top_label.grid(column = 0, row = 1)
 
         self.next_screen_button = tk.Button(master = self.base_frame, text = "Run prompts from selected topic/s",
-                    command = lambda: main_app.update_current_screen(main_app.display_prompts_frame.S_INDEX, main_app.current_screen),
+                    command = lambda: self.to_display_prompts_frame(main_app),
                     state = tk.DISABLED)
 
         self.previous_frame_button = tk.Button(master = self.base_frame, 
@@ -109,6 +124,10 @@ class TopicSelectFrame(BasicFrame):
         
         topic_row = self.make_topic_buttons()
         self.next_screen_button.grid(column = 0, row = topic_row + 1)
+    
+    def to_display_prompts_frame(self, main_app):
+        main_app.display_propmts_frame = DisplayPrompts(main_app)
+        main_app.update_current_screen(main_app.display_prompts_frame.S_INDEX, main_app.current_screen)
 
     def make_topic_buttons(self):
         topic_row = 1
@@ -154,10 +173,10 @@ class TopicSelectFrame(BasicFrame):
 
 class DisplayPrompts(BasicFrame):
     S_INDEX = "display_prompts_frame"
-    def __init__(self, parent, main_app, file_obj):
-        super().__init__(parent)
+    def __init__(self, main_app):
+        super().__init__(main_app.main_window)
 
-        self.topic_file = file_obj
+        self.topic_file = main_app.topic_file
         self.prompt_index = 0
         self.showing_answer = False
         self.end_of_prompts = False
@@ -248,14 +267,15 @@ class DisplayPrompts(BasicFrame):
             self.prompt_label.config(text = prompt)
         if answer is not None:
             self.answer_label.config(text = answer)
-            if answer is "":
+            if answer == "":
                 self.showing_answer = False
                 print("Not showing answer")
             else:
                 self.showing_answer = True
                 print("Showing answer")
 
-    def show(self):
+    def show(self, chosen_file):
+        self.topic_file = chosen_file
         self.topic_file.prompts_from_chosen_topics()
         self.topic_file.randomise_prompts()
 
@@ -272,16 +292,20 @@ class DisplayPrompts(BasicFrame):
         super().remove()
 
 class MainApp:
+    CWD = Path.cwd()
+    RESOURCES_DIR = "resources"
+
     def __init__(self, parent, name = None):
         self.main_window = parent
         self.current_screen = "intro_frame"
 
-        self.topic_file = JSONTopicHandler("topic.json")
+        self.default_file = Path.joinpath(self.CWD, MainApp.RESOURCES_DIR, "topic.json")
+        self.topic_file = JSONTopicHandler(self.default_file)
 
         self.intro_frame = IntroFrame(self.main_window)
         self.choose_file_frame = ChooseFileFrame(self)
-        self.topic_select_frame = TopicSelectFrame(self.main_window, self, self.topic_file)
-        self.display_prompts_frame = DisplayPrompts(self.main_window, self, self.topic_file)        
+        self.topic_select_frame = TopicSelectFrame(self)
+        self.display_prompts_frame = DisplayPrompts(self)        
 
         self.update_current_screen(self.intro_frame.S_INDEX)
 
@@ -311,7 +335,7 @@ class MainApp:
             self.topic_select_frame.show()
             self.current_screen = new_screen
         elif new_screen == "display_prompts_frame":
-            self.display_prompts_frame.show()
+            self.display_prompts_frame.show(self.topic_file)
             self.current_screen = new_screen
         elif new_screen == "choose_file_frame":
             self.choose_file_frame.show()
@@ -321,13 +345,16 @@ class MainApp:
             print("No previous screen, no screen unpacked.")
 
     def clear_instance(self):
+        del self.choose_file_frame
         del self.topic_select_frame
         del self.display_prompts_frame
         del self.topic_file
 
-        self.topic_file = JSONTopicHandler("topic.json")
-        self.topic_select_frame = TopicSelectFrame(self.main_window, self, self.topic_file)
-        self.display_prompts_frame = DisplayPrompts(self.main_window, self, self.topic_file)
+
+        self.topic_file = JSONTopicHandler(self.default_file)
+        self.choose_file_frame = ChooseFileFrame(self)
+        self.topic_select_frame = TopicSelectFrame(self)
+        self.display_prompts_frame = DisplayPrompts(self)
     
     def set_callbacks(self):
         def handle_callbacks(event, self = self):

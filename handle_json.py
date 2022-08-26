@@ -1,6 +1,8 @@
 import json
 import random
 
+from pathlib import Path
+
 class InvalidKeyError(Exception):
     def __init__(self, key, message = "Invalid key. Must be 'prompt' or 'answer'"):
         self.key = key
@@ -8,9 +10,11 @@ class InvalidKeyError(Exception):
         super().__init__(self.message)
 
 class JSONHandler():
-    def __init__(self, filename):
-        self.fname = filename
-        self.raw_string = JSONHandler.get_js(self.fname)
+    def __init__(self, in_filepath):
+        self.fpath = in_filepath
+        self.fname = Path(in_filepath).name
+        self.raw_string = JSONHandler.get_js(in_filepath)
+
 
     def output_string(self):
         print(self.raw_string)
