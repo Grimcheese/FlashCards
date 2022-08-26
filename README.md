@@ -40,9 +40,18 @@ Basically the file consists of a list of dictionaries containing topics and each
 ```
 
 # To do list - future features and ideas
+* UI Upgrade/Overhaul
+
+   At this stage FlashCards has a very basic UI with no colours or any thought put into making it a program easy and pleasant to use. When all of the main features have been implemented and work as expected work should begin on making the program look nice: use different colours, button and label placement through the app, advanced keybindings... but most important is some sort of consistent theme and layout. Without such the app is basically useless.
+
 * File selection
 
    FlashCards currently only supports reading from a single file that is located in the same directory as main_app.py. The file must be called "topic.json". It should be possible for the user to create their own JSON files and select them from any location they choose.
+
 * User input checking
 
    Answer checking could be included and would take simple input (eg, one or two word answers, single numbers, match single words from a sentence). Currently there is an entry box that allows for user input but there is no checking provided.
+
+* Creation of topic json files from within FlashCards
+
+   It should be possible for the user to create new topics and prompts from within the app rather than having to manually edit the JSON file. 
