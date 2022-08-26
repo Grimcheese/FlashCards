@@ -15,6 +15,7 @@ class BasicFrame():
         self.base_frame.grid_remove()
 
 class IntroFrame(BasicFrame):
+    S_INDEX = "intro_frame"
     def __init__(self, parent):
         super().__init__(parent)
         self.intro_label = None
@@ -27,7 +28,33 @@ class IntroFrame(BasicFrame):
         self.intro_label = tk.Label(master = self.base_frame, text = gui_reference_data["intro_frame"][0]["main_text"])
         self.intro_label.grid(column = 0, row = 0)
 
+class ChooseFileFrame(BasicFrame):
+    S_INDEX = "choose_file_frame"
+    def __init__(self, main_app):
+        super().__init__(main_app.main_window)
+
+        self.chosen_file = None
+        self.main_label = None
+
+        self.file_name_entry = None
+
+        self.build_choose_file(main_app)
+
+    def build_choose_file(self, main_app):
+        self.screen_labels()
+        
+        self.file_name_entry = tk.Entry(master = self.base_frame)
+        self.file_name_entry.grid(column = 1, row = 0)
+
+        self.file_name_button = tk.Button(master = self.base_frame, text = "Pick selected file.")
+        self.file_name_button.grid(column = 2, row = 0)
+
+    def screen_labels(self):
+        self.main_label = tk.Label(master = self.base_frame, text = "Choose file to read topics/prompts from: ")
+        self.main_label.grid(column = 0, row = 0)
+
 class TopicSelectFrame(BasicFrame):
+    S_INDEX = "topic_select_frame"
     def __init__(self, parent, main_app, in_file):
         super().__init__(parent)
 
@@ -48,12 +75,12 @@ class TopicSelectFrame(BasicFrame):
         self.top_label.grid(column = 0, row = 1)
 
         self.next_screen_button = tk.Button(master = self.base_frame, text = "Run prompts from selected topic/s",
-                                                command = lambda: main_app.update_current_screen(2, main_app.current_screen),
-                                                state = tk.DISABLED)
+                    command = lambda: main_app.update_current_screen(main_app.display_prompts_frame.S_INDEX, main_app.current_screen),
+                    state = tk.DISABLED)
 
         self.back_to_start_button = tk.Button(master = self.base_frame, 
-                                                text = "Back to intro!", 
-                                                command = lambda: main_app.update_current_screen(0, main_app.current_screen))
+                    text = "Back to intro!", 
+                    command = lambda: main_app.update_current_screen(main_app.intro_frame.S_INDEX, main_app.current_screen))
         self.back_to_start_button.grid(column = 0, row = 0)
         
         topic_row = self.make_topic_buttons()
@@ -102,6 +129,7 @@ class TopicSelectFrame(BasicFrame):
         self.topic_file.topic_string(1)
 
 class DisplayPrompts(BasicFrame):
+    S_INDEX = "display_prompts_frame"
     def __init__(self, parent, main_app, file_obj):
         super().__init__(parent)
 
@@ -131,10 +159,10 @@ class DisplayPrompts(BasicFrame):
 
     def build_run_prompts_screen(self, main_app):
         self.return_to_start_button = tk.Button(master = self.base_frame, text = "Return to start screen", 
-                                                    command = lambda: main_app.update_current_screen(0, main_app.current_screen))
+                    command = lambda: main_app.update_current_screen(main_app.intro_frame.S_INDEX, main_app.current_screen))
         self.return_to_start_button.grid(column = 0, row = 0)
         self.return_to_topic_select_button = tk.Button(master = self.base_frame, text = "Return to topic select",
-                                                        command = lambda: main_app.update_current_screen(1, main_app.current_screen))
+                    command = lambda: main_app.update_current_screen(main_app.topic_select_frame.S_INDEX, main_app.current_screen))
         self.return_to_topic_select_button.grid(column = 1, row = 0)
 
         self.top_label = tk.Label(master = self.base_frame, text = "Running through prompts!")
@@ -222,7 +250,7 @@ class DisplayPrompts(BasicFrame):
 class MainApp:
     def __init__(self, parent, name = None):
         self.main_window = parent
-        self.current_screen = 0
+        self.current_screen = "intro_frame"
 
         self.topic_file = JSONTopicHandler("topic.json")
 
@@ -230,35 +258,36 @@ class MainApp:
         self.topic_select_frame = TopicSelectFrame(self.main_window, self, self.topic_file)
         self.display_prompts_frame = DisplayPrompts(self.main_window, self, self.topic_file)        
 
-        self.update_current_screen(0)
+        self.update_current_screen(self.intro_frame.S_INDEX)
 
         self.set_callbacks()
 
     # Will change the current screen that is displayed on the main_window.
     # WARNING - If no current_screen is entered (no argument passed) no screen will be unpacked
-    def update_current_screen(self, new_screen, current_screen = -1):
+    def update_current_screen(self, new_screen, current_screen = None):
         # Unpack/destroy current frame in prep for building next frame
+        print("Current screen is: " + self.current_screen)
 
-        if current_screen == 0:
+        if current_screen == "intro_frame":
             self.intro_frame.remove()
-        elif current_screen == 1:
+        elif current_screen == "topic_select_frame":
             self.topic_select_frame.remove()
-        elif current_screen == 2:
+        elif current_screen == "display_prompts_frame":
             self.display_prompts_frame.remove()
 
         # Builds the next frame
-        if new_screen == 0:
+        if new_screen == "intro_frame":
             self.intro_frame.show()
             self.current_screen = new_screen
             self.clear_instance()
-        elif new_screen == 1:
+        elif new_screen == "topic_select_frame":
             self.topic_select_frame.show()
             self.current_screen = new_screen
-        elif new_screen == 2:
+        elif new_screen == "display_prompts_frame":
             self.display_prompts_frame.show()
             self.current_screen = new_screen
 
-        if current_screen == -1:
+        if current_screen == None:
             print("No previous screen, no screen unpacked.")
 
     def clear_instance(self):
@@ -272,26 +301,26 @@ class MainApp:
     
     def set_callbacks(self):
         def handle_callbacks(event, self = self):
-            if self.current_screen == 0:
-                self.update_current_screen(1, self.current_screen)
+            if self.current_screen == "intro_frame":
+                self.update_current_screen(self.topic_select_frame.S_INDEX, self.current_screen)
                 print("Any key pressed")
-            elif self.current_screen == 2 and (event.keysym == "Return" or event.keysym == "Right"):
+            elif self.current_screen == "display_prompts_frame" and (event.keysym == "Return" or event.keysym == "Right"):
                 next_display_prompt_callback(event, self)
-            elif self.current_screen == 2 and event.keysym == "Left":
+            elif self.current_screen == "display_prompts_frame" and event.keysym == "Left":
                 self.display_prompts_frame.previous_prompt()
         
         def next_display_prompt_callback(event, self = self):
             if self.display_prompts_frame.end_of_prompts is False:
                 self.display_prompts_frame.goto_next_prompt()
             elif self.display_prompts_frame.end_of_prompts is True and event.keysym == "Return":
-                self.update_current_screen(0, self.current_screen)
+                self.update_current_screen(self.intro_frame.S_INDEX, self.current_screen)
 
         self.main_window.bind("<Any-Key>", handle_callbacks) # Will trigger while any frame is up - perform check in callback method
         self.main_window.bind("<Any-Button>", handle_callbacks)
 
 
-    def start_prompts(self):
-        self.update_current_screen(2, self.current_screen)
+#    def start_prompts(self):
+#       self.update_current_screen(self., self.current_screen)
 
     
 
