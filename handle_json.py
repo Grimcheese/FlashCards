@@ -16,6 +16,9 @@ class JSONHandler():
         print(self.raw_string)
         print("String loaded from JSON file: " + self.fname)
 
+    def get_name(self):
+        return self.fname
+
     @classmethod
     def get_js(cls, fname):
         f = open(fname)

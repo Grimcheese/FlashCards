@@ -42,16 +42,40 @@ class ChooseFileFrame(BasicFrame):
 
     def build_choose_file(self, main_app):
         self.screen_labels()
+
+        self.previous_frame_button = tk.Button(master = self.base_frame, text = "Go back.",
+            command = lambda: main_app.update_current_screen(main_app.intro_frame.S_INDEX, main_app.current_screen))
+        self.previous_frame_button.grid(column = 0, row = 0)
+        self.next_frame_button = tk.Button(master = self.base_frame, text = "Choose: '" + main_app.topic_file.get_name() + "'",
+            command = lambda: main_app.update_current_screen(main_app.topic_select_frame.S_INDEX, main_app.current_screen))
+        self.next_frame_button.grid(column = 1, row = 0)
         
         self.file_name_entry = tk.Entry(master = self.base_frame)
-        self.file_name_entry.grid(column = 1, row = 0)
+        self.file_name_entry.grid(column = 1, row = 1)
 
-        self.file_name_button = tk.Button(master = self.base_frame, text = "Pick selected file.")
-        self.file_name_button.grid(column = 2, row = 0)
+        self.file_name_button = tk.Button(master = self.base_frame, text = "Pick selected file.", 
+                    command = self.search_for_file)
+        self.file_name_button.grid(column = 2, row = 1)
 
     def screen_labels(self):
         self.main_label = tk.Label(master = self.base_frame, text = "Choose file to read topics/prompts from: ")
-        self.main_label.grid(column = 0, row = 0)
+        self.main_label.grid(column = 0, row = 1)
+
+    def search_for_file(self):
+        file_name = ChooseFileFrame.get_file_name_input(self.file_name_entry.get())
+        if file_name is not None:
+            self.chosen_file = JSONTopicHandler(file_name)
+            self.next_frame_button.config(state = tk.ACTIVE)
+        else:
+            self.main_label.config(text = "Invalid name. Try again: ")
+
+# Gets a file name from the user's input. If the input is invalid, returns None
+    @classmethod
+    def get_file_name_input(cls, in_file_name):
+        if in_file_name:
+            return None
+
+        return None
 
 class TopicSelectFrame(BasicFrame):
     S_INDEX = "topic_select_frame"
@@ -62,7 +86,7 @@ class TopicSelectFrame(BasicFrame):
         self.topic_buttons = []
         self.chosen_topic_labels = []
         self.next_screen_button = None
-        self.back_to_start_button = None
+        self.previous_frame_button = None
 
         self.topic_file = in_file
         
@@ -78,10 +102,10 @@ class TopicSelectFrame(BasicFrame):
                     command = lambda: main_app.update_current_screen(main_app.display_prompts_frame.S_INDEX, main_app.current_screen),
                     state = tk.DISABLED)
 
-        self.back_to_start_button = tk.Button(master = self.base_frame, 
-                    text = "Back to intro!", 
-                    command = lambda: main_app.update_current_screen(main_app.intro_frame.S_INDEX, main_app.current_screen))
-        self.back_to_start_button.grid(column = 0, row = 0)
+        self.previous_frame_button = tk.Button(master = self.base_frame, 
+                    text = "Back to file selection.", 
+                    command = lambda: main_app.update_current_screen(main_app.choose_file_frame.S_INDEX, main_app.current_screen))
+        self.previous_frame_button.grid(column = 0, row = 0)
         
         topic_row = self.make_topic_buttons()
         self.next_screen_button.grid(column = 0, row = topic_row + 1)
@@ -255,6 +279,7 @@ class MainApp:
         self.topic_file = JSONTopicHandler("topic.json")
 
         self.intro_frame = IntroFrame(self.main_window)
+        self.choose_file_frame = ChooseFileFrame(self)
         self.topic_select_frame = TopicSelectFrame(self.main_window, self, self.topic_file)
         self.display_prompts_frame = DisplayPrompts(self.main_window, self, self.topic_file)        
 
@@ -274,6 +299,8 @@ class MainApp:
             self.topic_select_frame.remove()
         elif current_screen == "display_prompts_frame":
             self.display_prompts_frame.remove()
+        elif current_screen == "choose_file_frame":
+            self.choose_file_frame.remove()
 
         # Builds the next frame
         if new_screen == "intro_frame":
@@ -285,6 +312,9 @@ class MainApp:
             self.current_screen = new_screen
         elif new_screen == "display_prompts_frame":
             self.display_prompts_frame.show()
+            self.current_screen = new_screen
+        elif new_screen == "choose_file_frame":
+            self.choose_file_frame.show()
             self.current_screen = new_screen
 
         if current_screen == None:
@@ -302,7 +332,7 @@ class MainApp:
     def set_callbacks(self):
         def handle_callbacks(event, self = self):
             if self.current_screen == "intro_frame":
-                self.update_current_screen(self.topic_select_frame.S_INDEX, self.current_screen)
+                self.update_current_screen(self.choose_file_frame.S_INDEX, self.current_screen)
                 print("Any key pressed")
             elif self.current_screen == "display_prompts_frame" and (event.keysym == "Return" or event.keysym == "Right"):
                 next_display_prompt_callback(event, self)
