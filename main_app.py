@@ -48,7 +48,7 @@ class TopicSelectFrame(BasicFrame):
         self.top_label.grid(column = 0, row = 1)
 
         self.next_screen_button = tk.Button(master = self.base_frame, text = "Run prompts from selected topic/s",
-                                                command = lambda: main_app.start_prompts(),
+                                                command = lambda: main_app.update_current_screen(2, main_app.current_screen),
                                                 state = tk.DISABLED)
 
         self.back_to_start_button = tk.Button(master = self.base_frame, 
@@ -150,14 +150,14 @@ class DisplayPrompts(BasicFrame):
         self.answer_label.grid(column = 3, row = 3)
 
         self.start_prompts_button = tk.Button(master = self.base_frame, text = "Begin running through prompts",
-                                        command = self.start_prompts_button_command)
+                                        command = self.show_first_prompt)
         self.start_prompts_button.grid(column = 4, row = 0)
 
         self.user_answer = tk.Entry(master = self.base_frame)
         self.user_answer.grid(column = 2, row = 3)
 
-    def start_prompts_button_command(self):
-        self.prompt_labels_update(self.topic_file.get_value(self.prompt_index, "prompt"))
+    def show_first_prompt(self):
+        self.prompt_labels_update(self.topic_file.get_value(0, "prompt"))
         self.start_prompts_button.grid_remove()
         self.start_prompts_button.config(state = tk.DISABLED)
 
@@ -208,6 +208,7 @@ class DisplayPrompts(BasicFrame):
         self.topic_file.randomise_prompts()
 
         self.topic_file.print_prompts()
+        self.show_first_prompt()
 
         super().show()
 
@@ -280,11 +281,10 @@ class MainApp:
                 self.display_prompts_frame.previous_prompt()
         
         def next_display_prompt_callback(event, self = self):
-            if self.current_screen == 2:
-                if self.display_prompts_frame.end_of_prompts is False:
-                    self.display_prompts_frame.goto_next_prompt()
-                else:
-                    self.update_current_screen(0, self.current_screen)
+            if self.display_prompts_frame.end_of_prompts is False:
+                self.display_prompts_frame.goto_next_prompt()
+            elif self.display_prompts_frame.end_of_prompts is True and event.keysym == "Return":
+                self.update_current_screen(0, self.current_screen)
 
         self.main_window.bind("<Any-Key>", handle_callbacks) # Will trigger while any frame is up - perform check in callback method
         self.main_window.bind("<Any-Button>", handle_callbacks)
