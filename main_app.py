@@ -382,13 +382,6 @@ class MainApp:
         self.main_window.bind("<Any-Key>", handle_callbacks) # Will trigger while any frame is up - perform check in callback method
         self.main_window.bind("<Any-Button>", handle_callbacks)
 
-
-#    def start_prompts(self):
-#       self.update_current_screen(self., self.current_screen)
-
-    
-
-
 if __name__ == "__main__":
     main_window = tk.Tk()
     main_window.title("FlashCards! - The best way to study-")

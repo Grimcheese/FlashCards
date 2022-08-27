@@ -1,7 +1,9 @@
 import json
+import jsonschema
 import random
 
 from pathlib import Path
+
 
 class InvalidKeyError(Exception):
     def __init__(self, key, message = "Invalid key. Must be 'prompt' or 'answer'"):
@@ -128,10 +130,13 @@ class JSONTopicHandler(JSONHandler):
         return topics
 
 def run_module_tests():
-    json_data = JSONHandler("topic.json")
+    file_name = "topic.json"
+    cwd = Path.cwd()
+    file_path = Path.joinpath(cwd, "resources", file_name)
+    json_data = JSONHandler(file_path)
     json_data.output_string()
 
-    json_data = JSONTopicHandler("topic.json")
+    json_data = JSONTopicHandler(file_path)
     json_data.output_string()
 
     json_data.set_topic("Ports")
@@ -163,8 +168,27 @@ def run_module_tests():
     except IndexError:
         print("There was an exception raised in the method")
 
+def schema_tests():
+    print("****************")
+    print("Testing file validation with jsonschema")
+    schema = [
+        {
+            "type" : "string",
+            "type" : [
+                {
+                    "type" : "string",
+                    "type" : "string"
+                }
+            ]
+        }
+    ]
+    f = open("validate_file.json")
+    test_file = json.load(f)
+    jsonschema.validate(test_file, schema)
+
 # If ran as a python script begin running tests that output to console
 if __name__ == "__main__":
     run_module_tests()
+    #schema_tests()
     
 

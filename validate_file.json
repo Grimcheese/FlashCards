@@ -1,0 +1,11 @@
+[
+    {
+        "topic_name": "New file test topic",
+        "prompts": [
+            {
+                "prompt": "What is a good question?",
+                "answer": "The one that is asked."
+            }
+        ]
+    }
+]
