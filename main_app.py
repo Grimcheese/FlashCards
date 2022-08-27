@@ -36,7 +36,7 @@ class ChooseFileFrame(BasicFrame):
     def __init__(self, main_app):
         super().__init__(main_app.main_window)
 
-        self.chosen_file = None
+        self.chosen_file = main_app.topic_file
 
         self.found_files = []
         self.files_display = []
@@ -61,8 +61,7 @@ class ChooseFileFrame(BasicFrame):
         self.show_files()
 
     def to_topic_select(self, main_app):
-        if self.chosen_file is not None:
-            main_app.topic_file = self.chosen_file
+        main_app.topic_file = self.chosen_file
         main_app.topic_select_frame = TopicSelectFrame(main_app)
         main_app.update_current_screen(main_app.topic_select_frame.S_INDEX, main_app.current_screen)
 
@@ -224,8 +223,8 @@ class DisplayPrompts(BasicFrame):
                                         command = self.show_first_prompt)
         self.start_prompts_button.grid(column = 4, row = 0)
 
-        self.user_answer = tk.Entry(master = self.base_frame)
-        self.user_answer.grid(column = 2, row = 3)
+        self.counter_label = tk.Label(master = self.base_frame, text = "")
+        self.counter_label.grid(column = 4, row = 0)
 
     def show_first_prompt(self):
         self.prompt_labels_update(self.topic_file.get_value(0, "prompt"))
@@ -273,6 +272,15 @@ class DisplayPrompts(BasicFrame):
             else:
                 self.showing_answer = True
                 print("Showing answer")
+        self.update_counter()
+    
+    def update_counter(self):
+        num_prompts = self.topic_file.number_of_prompts()
+        if self.prompt_index < num_prompts:
+            count_val = str(self.prompt_index + 1) + " / " + str(num_prompts)
+            self.counter_label.config(text = count_val)
+        else:
+            self.counter_label.config(text = "")
 
     def show(self, chosen_file):
         self.topic_file = chosen_file
@@ -294,13 +302,13 @@ class DisplayPrompts(BasicFrame):
 class MainApp:
     CWD = Path.cwd()
     RESOURCES_DIR = "resources"
+    default_file_path = Path.joinpath(CWD, RESOURCES_DIR, "topic.json")
 
     def __init__(self, parent, name = None):
         self.main_window = parent
         self.current_screen = "intro_frame"
 
-        self.default_file = Path.joinpath(self.CWD, MainApp.RESOURCES_DIR, "topic.json")
-        self.topic_file = JSONTopicHandler(self.default_file)
+        self.topic_file = JSONTopicHandler(MainApp.default_file_path)
 
         self.intro_frame = IntroFrame(self.main_window)
         self.choose_file_frame = ChooseFileFrame(self)
@@ -350,8 +358,7 @@ class MainApp:
         del self.display_prompts_frame
         del self.topic_file
 
-
-        self.topic_file = JSONTopicHandler(self.default_file)
+        self.topic_file = JSONTopicHandler(MainApp.default_file_path)
         self.choose_file_frame = ChooseFileFrame(self)
         self.topic_select_frame = TopicSelectFrame(self)
         self.display_prompts_frame = DisplayPrompts(self)
