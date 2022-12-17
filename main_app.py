@@ -1,5 +1,29 @@
-# Module that defines the GUI elements of FlashCards
+"""FlashCards GUI definitions.
+
+This is the main program file. Run FlashCards by executing this script.
+
+Each section of the program to be displayed in the main window is created as a 
+separate frame which has its own class. Each frame class derives from the 
+BasicFrame which provides the show() and remove() methods to hide and show the
+frame as required when moving between sections of the program.
+
+Each frame is designed to only be used by MainApp which manages switching between
+each frame while each frame class defines the widgets and their functions that
+should belong to that frame.
+
+Classes:
+    BasicFrame
+    IntroFrame
+    ChooseFileFrame
+    TopicSelectFrame
+    DisplayPrompts
+    
+    MainApp
+    
+TODO Update widgets to themed ttk widgets.
+"""
 import tkinter as tk
+from tkinter import ttk
 import json
 
 from handle_json import JSONHandler
@@ -9,6 +33,13 @@ from pathlib import Path
 
 
 class BasicFrame:
+    """A generic tkinter frame that can be further extended.
+
+    Provides a base frame class that can be hidden or shown. Allows MainApp to
+    easily switch between frames which have been further customised with
+    additional widgets to have different frames within the main program window.
+    """
+
     def __init__(self, parent):
         self.base_frame = tk.Frame(master=parent)
 
