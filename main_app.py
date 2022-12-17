@@ -41,7 +41,7 @@ class BasicFrame:
     """
 
     def __init__(self, parent):
-        self.base_frame = tk.Frame(master=parent)
+        self.base_frame = ttk.Frame(master=parent)
 
     def show(self):
         self.base_frame.grid()
@@ -62,7 +62,7 @@ class IntroFrame(BasicFrame):
     def build_intro_screen(self):
         gui_reference_data = JSONHandler.get_js("gui_reference.json")
 
-        self.intro_label = tk.Label(
+        self.intro_label = ttk.Label(
             master=self.base_frame,
             text=gui_reference_data["intro_frame"][0]["main_text"],
         )
@@ -87,12 +87,12 @@ class ChooseFileFrame(BasicFrame):
         self.build_choose_file_frame(main_app)
 
     def build_choose_file_frame(self, main_app):
-        self.main_label = tk.Label(
-            master=self.base_frame, text="Choose file to read topics/prompts from: "
+        self.main_label = ttk.Label(
+            master=self.base_frame, text="Choose file to read topics/prompts from"
         )
         self.main_label.grid(column=0, row=1)
 
-        self.previous_frame_button = tk.Button(
+        self.previous_frame_button = ttk.Button(
             master=self.base_frame,
             text="Go back.",
             command=lambda: main_app.update_current_screen(
@@ -100,10 +100,11 @@ class ChooseFileFrame(BasicFrame):
             ),
         )
         self.previous_frame_button.grid(column=0, row=0)
-        self.next_frame_button = tk.Button(
+        self.next_frame_button = ttk.Button(
             master=self.base_frame,
             text="Choose: '" + main_app.topic_file.get_name() + "'",
             command=lambda: self.to_topic_select(main_app),
+            width=25,
         )
         self.next_frame_button.grid(column=1, row=0)
 
@@ -127,13 +128,14 @@ class ChooseFileFrame(BasicFrame):
                 self.found_files.append(file)
                 file_name = Path(file).name
                 self.files_display.append(
-                    tk.Button(
+                    ttk.Button(
                         master=self.base_frame,
                         text=file_name,
                         command=lambda file=file: self.pick_file(file),
+                        width=25,
                     )
                 )
-                self.files_display[file_index].grid(column=3, row=file_index + 2)
+                self.files_display[file_index].grid(column=0, row=file_index + 2)
 
                 file_index += 1
             except json.decoder.JSONDecodeError:
@@ -166,17 +168,17 @@ class TopicSelectFrame(BasicFrame):
         self.build_topic_select_screen(main_app)
 
     def build_topic_select_screen(self, main_app):
-        self.top_label = tk.Label(master=self.base_frame, text="Topics from file: ")
+        self.top_label = ttk.Label(master=self.base_frame, text="Topics from file: ")
         self.top_label.grid(column=0, row=1)
 
-        self.next_screen_button = tk.Button(
+        self.next_screen_button = ttk.Button(
             master=self.base_frame,
             text="Run prompts from selected topic/s",
             command=lambda: self.to_display_prompts_frame(main_app),
             state=tk.DISABLED,
         )
 
-        self.previous_frame_button = tk.Button(
+        self.previous_frame_button = ttk.Button(
             master=self.base_frame,
             text="Back to file selection.",
             command=lambda: main_app.update_current_screen(
@@ -198,17 +200,15 @@ class TopicSelectFrame(BasicFrame):
         topic_row = 1
         for topic in self.topic_file.topics:
             self.topic_buttons.append(
-                tk.Button(
+                ttk.Button(
                     master=self.base_frame,
                     text=topic,
-                    justify=tk.LEFT,
-                    wraplength=145,
                     width=20,
                     command=lambda topic=topic: self.pick_topics(topic),
                 )
             )
 
-            self.chosen_topic_labels.append(tk.Label(master=self.base_frame, text=""))
+            self.chosen_topic_labels.append(ttk.Label(master=self.base_frame, text=""))
             self.update_picked_topics_label(topic)
 
             self.topic_buttons[topic_row - 1].grid(column=1, row=topic_row, sticky=tk.W)
@@ -271,7 +271,7 @@ class DisplayPrompts(BasicFrame):
             print(self.topic_file.get_value(i, "prompt"))
 
     def build_run_prompts_screen(self, main_app):
-        self.return_to_start_button = tk.Button(
+        self.return_to_start_button = ttk.Button(
             master=self.base_frame,
             text="Return to start screen",
             command=lambda: main_app.update_current_screen(
@@ -279,7 +279,7 @@ class DisplayPrompts(BasicFrame):
             ),
         )
         self.return_to_start_button.grid(column=0, row=0)
-        self.return_to_topic_select_button = tk.Button(
+        self.return_to_topic_select_button = ttk.Button(
             master=self.base_frame,
             text="Return to topic select",
             command=lambda: main_app.update_current_screen(
@@ -288,33 +288,33 @@ class DisplayPrompts(BasicFrame):
         )
         self.return_to_topic_select_button.grid(column=1, row=0)
 
-        self.top_label = tk.Label(
+        self.top_label = ttk.Label(
             master=self.base_frame, text="Running through prompts!"
         )
         self.top_label.grid(column=2, row=0)
 
-        self.back_button = tk.Button(
+        self.back_button = ttk.Button(
             master=self.base_frame,
             text="Go back a prompt",
             command=self.previous_prompt,
         )
         self.back_button.grid(column=3, row=0)
 
-        self.prompt_label = tk.Label(
+        self.prompt_label = ttk.Label(
             master=self.base_frame, text="", width=22, wraplength=100
         )
         self.prompt_label.grid(column=2, columnspan=2, row=2)
-        self.answer_label = tk.Label(master=self.base_frame, text="")
+        self.answer_label = ttk.Label(master=self.base_frame, text="")
         self.answer_label.grid(column=3, row=3)
 
-        self.start_prompts_button = tk.Button(
+        self.start_prompts_button = ttk.Button(
             master=self.base_frame,
             text="Begin running through prompts",
             command=self.show_first_prompt,
         )
         self.start_prompts_button.grid(column=4, row=0)
 
-        self.counter_label = tk.Label(master=self.base_frame, text="")
+        self.counter_label = ttk.Label(master=self.base_frame, text="")
         self.counter_label.grid(column=4, row=0)
 
     def show_first_prompt(self):
