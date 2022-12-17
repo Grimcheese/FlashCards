@@ -19,8 +19,7 @@ Classes:
     DisplayPrompts
     
     MainApp
-    
-TODO Update widgets to themed ttk widgets.
+
 """
 import tkinter as tk
 from tkinter import ttk
@@ -51,15 +50,31 @@ class BasicFrame:
 
 
 class IntroFrame(BasicFrame):
+    """The intro screen to be displayed to the user on program start.
+
+    Extends a BasicFrame object with widgets to display the intro screen. Can be
+    referred to by using it's string index S_INDEX variable.
+    """
+
     S_INDEX = "intro_frame"
 
     def __init__(self, parent):
+        """Initalise a frame by extending from a BasicFrame.
+
+        Args:
+            parent: The parent container for IntroFrame"""
+
         super().__init__(parent)
         self.intro_label = None
 
         self.build_intro_screen()
 
     def build_intro_screen(self):
+        """Define and place the widgets for the intro screen.
+
+        Reads the label to be displayed from a JSON file called gui_reference.json
+        """
+
         gui_reference_data = JSONHandler.get_js("gui_reference.json")
 
         self.intro_label = ttk.Label(
@@ -70,9 +85,23 @@ class IntroFrame(BasicFrame):
 
 
 class ChooseFileFrame(BasicFrame):
+    """The screen to be displayed for choosing a topic file.
+
+    Extends the functionality of a BasicFrame by adding widgets to allow for
+    displaying and choosing files. Can be referred to by using its string index
+    S_INDEX.
+    """
+
     S_INDEX = "choose_file_frame"
 
     def __init__(self, main_app):
+        """Initialise the choose file frame by extending from a BasicFrame.
+
+        Args:
+            main_app: The parent container which is the window this frame will
+                sit in.
+        """
+
         super().__init__(main_app.main_window)
 
         self.chosen_file = main_app.topic_file
@@ -87,6 +116,12 @@ class ChooseFileFrame(BasicFrame):
         self.build_choose_file_frame(main_app)
 
     def build_choose_file_frame(self, main_app):
+        """Define and place the widgets to be used for the choose file screen.
+
+        Args:
+            main_app: The tk main window object which links all elements together.
+        """
+
         self.main_label = ttk.Label(
             master=self.base_frame, text="Choose file to read topics/prompts from"
         )
@@ -111,6 +146,8 @@ class ChooseFileFrame(BasicFrame):
         self.show_files()
 
     def to_topic_select(self, main_app):
+        """Change display from choose file screen to topic select screen."""
+
         main_app.topic_file = self.chosen_file
         main_app.topic_select_frame = TopicSelectFrame(main_app)
         main_app.update_current_screen(
@@ -118,6 +155,8 @@ class ChooseFileFrame(BasicFrame):
         )
 
     def show_files(self):
+        """Display a list of files that can be used."""
+
         rsrc_dir = Path(MainApp.CWD, MainApp.RESOURCES_DIR)
 
         file_index = 0
@@ -142,6 +181,8 @@ class ChooseFileFrame(BasicFrame):
                 print("Not a valid FlashCards file")
 
     def pick_file(self, f_path):
+        """Select the file after button press and update widgets on the frame."""
+
         new_file = JSONTopicHandler(f_path)
         self.chosen_file = new_file
         print("Picking file: " + new_file.get_name())
