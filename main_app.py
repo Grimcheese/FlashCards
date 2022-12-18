@@ -119,7 +119,7 @@ class ChooseFileFrame(BasicFrame):
         """Define and place the widgets to be used for the choose file screen.
 
         Args:
-            main_app: The tk main window object which links all elements together.
+            main_app: The tk main window object which links all frames together.
         """
 
         self.main_label = ttk.Label(
@@ -181,7 +181,10 @@ class ChooseFileFrame(BasicFrame):
                 print("Not a valid FlashCards file")
 
     def pick_file(self, f_path):
-        """Select the file after button press and update widgets on the frame."""
+        """Select the file after button press and update widgets on the frame.
+
+        Args:
+            f_path: The file path that points to the file that has been selected."""
 
         new_file = JSONTopicHandler(f_path)
         self.chosen_file = new_file
@@ -191,9 +194,20 @@ class ChooseFileFrame(BasicFrame):
 
 
 class TopicSelectFrame(BasicFrame):
+    """The screen to be displayed when selecting which topics the program will run.
+
+    Provides the following functions:
+        Return to file selection
+        A list of topics from the file displayed as buttons
+        Labels displaying if a topic has been chosen
+        A button to run the prompts from the selected topics
+    """
+
     S_INDEX = "topic_select_frame"
 
     def __init__(self, main_app):
+        """Initialises the frame with main_app as the parent."""
+
         super().__init__(main_app.main_window)
 
         self.top_label = None
@@ -209,6 +223,12 @@ class TopicSelectFrame(BasicFrame):
         self.build_topic_select_screen(main_app)
 
     def build_topic_select_screen(self, main_app):
+        """Define and place the widgets used for topic selection.
+
+        Args:
+            main_app: The tk main window object that links all frames together.
+        """
+
         self.top_label = ttk.Label(master=self.base_frame, text="Topics from file: ")
         self.top_label.grid(column=0, row=1)
 
@@ -232,12 +252,26 @@ class TopicSelectFrame(BasicFrame):
         self.next_screen_button.grid(column=0, row=topic_row + 1)
 
     def to_display_prompts_frame(self, main_app):
+        """Update the main_app window frame to the display prompts screen.
+
+        Args:
+            main_app: The tk main window object which the program is displayed
+                from.
+        """
+
         main_app.display_propmts_frame = DisplayPrompts(main_app)
         main_app.update_current_screen(
             main_app.display_prompts_frame.S_INDEX, main_app.current_screen
         )
 
     def make_topic_buttons(self):
+        """Creates a list of button widgets, one for each topic in the file.
+
+        Returns:
+            topic_row: The number of buttons that have been created so there is
+                a reference that the TopicSelectFrame can organise other
+                widgets for this frame on the grid correctly."""
+
         topic_row = 1
         for topic in self.topic_file.topics:
             self.topic_buttons.append(
@@ -259,12 +293,16 @@ class TopicSelectFrame(BasicFrame):
         return topic_row
 
     def pick_topics(self, selected_topic):
+        """Update the list of selected topics with the selected_topic argument."""
+
         print("You have selected: " + selected_topic)
         self.topic_file.set_topic(selected_topic)
 
         self.update_picked_topics_label(selected_topic)
 
     def update_picked_topics_label(self, selected_topic):
+        """Update the corresponding selected_topic label when a topic is selected."""
+
         topic_label_index = self.topic_file.topics.index(selected_topic)
         is_selected = self.topic_file.topic_is_selected(selected_topic)
         if is_selected:
@@ -283,9 +321,23 @@ class TopicSelectFrame(BasicFrame):
 
 
 class DisplayPrompts(BasicFrame):
+    """The screen that displays prompts and their answers to the user.
+
+    Provides the following functions:
+        Return to start screen or topic select buttons
+        The ability to navigate through all the prompts from chosen topics
+        Displays a prompt and an answer
+        Navigation using arrow keys or buttons"""
+
     S_INDEX = "display_prompts_frame"
 
     def __init__(self, main_app):
+        """Initialise the display prompt screen with the parent element.
+
+        Args:
+            main_app: The parent main window which contains the entire program.
+        """
+
         super().__init__(main_app.main_window)
 
         self.topic_file = main_app.topic_file
@@ -306,12 +358,23 @@ class DisplayPrompts(BasicFrame):
         self.build_run_prompts_screen(main_app)
 
     def checkfile(self):
+        """Prints values of prompts from the file to console.
+
+        Used for debugging purposes, not required for program interface.
+        """
+
         self.topic_file.topic_string()
         print("Number of prompts: " + str(self.topic_file.number_of_prompts()))
         for i in range(self.topic_file.number_of_prompts()):
             print(self.topic_file.get_value(i, "prompt"))
 
     def build_run_prompts_screen(self, main_app):
+        """Create and place the widgets used to display the prompts.
+
+        Args:
+            main_app: The main window which the program is contained within.
+        """
+
         self.return_to_start_button = ttk.Button(
             master=self.base_frame,
             text="Return to start screen",
@@ -359,11 +422,15 @@ class DisplayPrompts(BasicFrame):
         self.counter_label.grid(column=4, row=0)
 
     def show_first_prompt(self):
+        """Display the initial prompt from the randomised list."""
+
         self.prompt_labels_update(self.topic_file.get_value(0, "prompt"))
         self.start_prompts_button.grid_remove()
         self.start_prompts_button.config(state=tk.DISABLED)
 
     def previous_prompt(self):
+        """Display the prompt at the index from current prompt - 1."""
+
         if self.prompt_index > 0:
             self.prompt_index = self.prompt_index - 1
             self.prompt_labels_update(
@@ -376,6 +443,8 @@ class DisplayPrompts(BasicFrame):
             print("Current index number: " + str(self.prompt_index))
 
     def goto_next_prompt(self):
+        """Update the next prompt or answer depending on current display."""
+
         print("Current index: " + str(self.prompt_index))
         try:
             if self.showing_answer:
@@ -393,12 +462,27 @@ class DisplayPrompts(BasicFrame):
             self.end_of_prompts = True
 
     def next_prompt(self):
+        """Send the value of the next prompt with no answer to the prompt label."""
+
         self.prompt_index = self.prompt_index + 1
         self.prompt_labels_update(
             prompt=self.topic_file.get_value(self.prompt_index, "prompt"), answer=""
         )
 
     def prompt_labels_update(self, prompt=None, answer=None):
+        """Update the prompt and answer labels.
+
+        Can choose to update either prompt, answer or both depending on given
+        arguments. Each has a default of None. Updates the current prompt
+        counter with the current index value.
+
+        Args:
+            prompt: The text to display on the prompt label. A none value results
+                in no change.
+            answer: The text to display on the answer label. A none value results
+                in no change.
+        """
+
         if prompt is not None:
             self.prompt_label.config(text=prompt)
         if answer is not None:
@@ -412,6 +496,11 @@ class DisplayPrompts(BasicFrame):
         self.update_counter()
 
     def update_counter(self):
+        """Display the index of the current prompt being displayed.
+
+        Will display current_index/total_number_of_propmts
+        """
+
         num_prompts = self.topic_file.number_of_prompts()
         if self.prompt_index < num_prompts:
             count_val = str(self.prompt_index + 1) + " / " + str(num_prompts)
@@ -420,6 +509,8 @@ class DisplayPrompts(BasicFrame):
             self.counter_label.config(text="")
 
     def show(self, chosen_file):
+        """Extends BasicFrame show functionality to properly set topic file."""
+
         self.topic_file = chosen_file
         self.topic_file.prompts_from_chosen_topics()
         self.topic_file.randomise_prompts()
@@ -430,6 +521,8 @@ class DisplayPrompts(BasicFrame):
         super().show()
 
     def remove(self):
+        """Extends BasicFrame remove to properly reset class attributes."""
+
         self.prompt_index = 0
         self.showing_prompt = False
         self.prompt_labels_update("", "")
@@ -438,11 +531,19 @@ class DisplayPrompts(BasicFrame):
 
 
 class MainApp:
+    """The main app window and its functionality.
+
+    Contains each frame as an attribute and allows for switching between the
+    frames as the user moves through the program.
+    """
+
     CWD = Path.cwd()
     RESOURCES_DIR = "resources"
     default_file_path = Path.joinpath(CWD, RESOURCES_DIR, "topic.json")
 
     def __init__(self, parent, name=None):
+        """Initialises the main window with a root tk window."""
+
         self.main_window = parent
         self.current_screen = "intro_frame"
 
@@ -457,9 +558,18 @@ class MainApp:
 
         self.set_callbacks()
 
-    # Will change the current screen that is displayed on the main_window.
-    # WARNING - If no current_screen is entered (no argument passed) no screen will be unpacked
     def update_current_screen(self, new_screen, current_screen=None):
+        """Switch currently displayed frame to new_screen.
+
+        WARNING - If no current_screen is entered (no argument passed) no screen
+        will be unpacked/displayed
+
+        Args:
+            new_screen: The new screen to display in MainApp. This argument
+                should be a string value which represents one of the defined
+                class attributes S_INDEX.
+            current_screen: The current_screen which should be removed.
+        """
         # Unpack/destroy current frame in prep for building next frame
         print("Current screen is: " + self.current_screen)
 
@@ -491,6 +601,8 @@ class MainApp:
             print("No previous screen, no screen unpacked.")
 
     def clear_instance(self):
+        """Delete each frame object and create a new one."""
+
         del self.choose_file_frame
         del self.topic_select_frame
         del self.display_prompts_frame
@@ -502,6 +614,8 @@ class MainApp:
         self.display_prompts_frame = DisplayPrompts(self)
 
     def set_callbacks(self):
+        """Define all the callback functions and wrappers to use for bindings."""
+
         def handle_callbacks(event, self=self):
             if self.current_screen == "intro_frame":
                 self.update_current_screen(
