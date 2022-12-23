@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "flashcards"
+version = "0.1.0"
+description = "Interactive program to study using flash cards"
+authors = ["Grimcheese <albychawula@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+black = "^22.12.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
