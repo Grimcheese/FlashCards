@@ -529,6 +529,25 @@ class DisplayPrompts(BasicFrame):
 
         super().remove()
 
+class CreateTopicFrame(BasicFrame):
+    """Displays text boxes to allow the user to create their own topics."""
+
+    S_INDEX = "create_topic_frame"
+
+    def __init__(self, main_app):
+        """Initialise the create topic screen with parent element.
+        
+        Args:
+            main_app: The parent window this frame has as a parent.
+        """
+
+        super().__init__(main_app)
+
+        self.build_create_topic_frame(main_app)
+    
+    def build_create_topic_frame(self, main_app):
+        """Define and place widgets that make up the create topic frame."""
+
 
 class MainApp:
     """The main app window and its functionality.
