@@ -143,6 +143,16 @@ class ChooseFileFrame(BasicFrame):
         )
         self.next_frame_button.grid(column=1, row=0)
 
+        self.create_file_button = ttk.Button(
+            master=self.base_frame,
+            text="Create new file",
+            width=25,
+            command=lambda: main_app.update_current_screen(
+                main_app.create_topic_frame.S_INDEX, main_app.current_screen
+            ),
+        )
+        self.create_file_button.grid(column=3, row=0)
+
         self.show_files()
 
     def to_topic_select(self, main_app):
@@ -529,24 +539,39 @@ class DisplayPrompts(BasicFrame):
 
         super().remove()
 
+
 class CreateTopicFrame(BasicFrame):
-    """Displays text boxes to allow the user to create their own topics."""
+    """Displays text boxes to allow the user to create their own topics.
+
+
+    Allow the user to choose a file to modify or create a new one,
+    then the topic to add to or create. Then once file and topic is
+    selected, enter the new prompt and answer.
+    """
 
     S_INDEX = "create_topic_frame"
 
     def __init__(self, main_app):
         """Initialise the create topic screen with parent element.
-        
+
         Args:
             main_app: The parent window this frame has as a parent.
         """
 
-        super().__init__(main_app)
+        super().__init__(main_app.main_window)
 
-        self.build_create_topic_frame(main_app)
-    
-    def build_create_topic_frame(self, main_app):
-        """Define and place widgets that make up the create topic frame."""
+        self.build_create_topic_frame()
+
+    def build_create_topic_frame(self):
+        """Define and place widgets that make up the create topic frame.
+
+
+        Args:
+            main_app: The parent window the frame sits witin.
+        """
+
+        self.prompt_box = tk.Text(self.base_frame, width=60, height=1, wrap="none")
+        self.answer_box = tk.Text(self.base_frame, width=60, height=2, wrap="word")
 
 
 class MainApp:
@@ -569,6 +594,7 @@ class MainApp:
         self.topic_file = JSONTopicHandler(MainApp.default_file_path)
 
         self.intro_frame = IntroFrame(self.main_window)
+        self.create_topic_frame = CreateTopicFrame(self)
         self.choose_file_frame = ChooseFileFrame(self)
         self.topic_select_frame = TopicSelectFrame(self)
         self.display_prompts_frame = DisplayPrompts(self)
@@ -600,8 +626,10 @@ class MainApp:
             self.display_prompts_frame.remove()
         elif current_screen == "choose_file_frame":
             self.choose_file_frame.remove()
+        elif current_screen == "create_topic_frame":
+            self.create_topic_frame.remove()
 
-        # Builds the next frame
+        # Builds the next frame using show()
         if new_screen == "intro_frame":
             self.intro_frame.show()
             self.current_screen = new_screen
@@ -614,6 +642,9 @@ class MainApp:
             self.current_screen = new_screen
         elif new_screen == "choose_file_frame":
             self.choose_file_frame.show()
+            self.current_screen = new_screen
+        elif new_screen == "create_topic_frame":
+            self.create_topic_frame.show()
             self.current_screen = new_screen
 
         if current_screen == None:
