@@ -569,9 +569,17 @@ class CreateTopicFrame(BasicFrame):
         Args:
             main_app: The parent window the frame sits witin.
         """
+        self.prompt_box_label = ttk.Label(self.base_frame, text="New prompt")
+        self.prompt_box_label.grid(column=0, row=1)
 
         self.prompt_box = tk.Text(self.base_frame, width=60, height=1, wrap="none")
+        self.prompt_box.grid(column=1, row=1)
+
+        self.answer_box_label = ttk.Label(self.base_frame, text="New answer")
+        self.answer_box_label.grid(column=0, row=2)
+
         self.answer_box = tk.Text(self.base_frame, width=60, height=2, wrap="word")
+        self.answer_box.grid(column=1, row=2)
 
 
 class MainApp:
