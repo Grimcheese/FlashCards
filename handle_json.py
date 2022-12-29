@@ -22,16 +22,25 @@ from pathlib import Path
 # Module helper functions
 
 
-def get_files(dir):
+def get_files(directory, blacklist=[], whitelist=[]):
     """Get a list of the names of each file in a given directory.
 
+    Ignores directories and hidden files. Assumes that
+
     Args:
-        dir: A pathlib Path containing the location of desired files.
+        directory: A pathlib Path containing the location of desired files.
+        whitelist: A list of file extensions to search for
+        blacklist: A list of file extensions to ignore
+
     """
 
     found_files = []
-    for file in dir.iterdir():
+    for file in directory.iterdir():
         fname = Path(file).name
+
+        if fname[0] == ".":
+            continue
+
         found_files.append(fname)
     return found_files
 
