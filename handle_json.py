@@ -19,6 +19,22 @@ import random
 
 from pathlib import Path
 
+# Module helper functions
+
+
+def get_files(dir):
+    """Get a list of the names of each file in a given directory.
+
+    Args:
+        dir: A pathlib Path containing the location of desired files.
+    """
+
+    found_files = []
+    for file in dir.iterdir():
+        fname = Path(file).name
+        found_files.append(fname)
+    return found_files
+
 
 class InvalidKeyError(Exception):
     """An invalid key has been used to access a JSON object.
