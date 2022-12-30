@@ -25,6 +25,7 @@ import tkinter as tk
 from tkinter import ttk
 import json
 
+import handle_json
 from handle_json import JSONHandler
 from handle_json import JSONTopicHandler
 
@@ -165,7 +166,7 @@ class ChooseFileFrame(BasicFrame):
         )
 
     def show_files(self):
-        """Display a list of files that can be used."""
+        """Display a list of files that can be used as button widgets."""
 
         rsrc_dir = Path(MainApp.CWD, MainApp.RESOURCES_DIR)
 
@@ -565,21 +566,52 @@ class CreateTopicFrame(BasicFrame):
     def build_create_topic_frame(self):
         """Define and place widgets that make up the create topic frame.
 
-
         Args:
             main_app: The parent window the frame sits witin.
         """
+        # Choose the file
+        self.files_label = ttk.Label(self.base_frame, text="File")
+        self.files_label.grid(column=1, row=3)
+
+        files = handle_json.get_files(Path(Path.cwd(), "resources"))
+        files_var = tk.StringVar(value=files)
+
+        # List box and bindings
+        self.file_listbox = tk.Listbox(
+            self.base_frame, listvariable=files_var, height=5
+        )
+        self.file_listbox.grid(column=1, row=4)
+
+        self.file_listbox.bind(
+            "<<ListboxSelect>>",
+            lambda f: self.display_topics_from_file(self.file_listbox.curselection()),
+        )
+
+        # Choose the topic from the file
+
         self.prompt_box_label = ttk.Label(self.base_frame, text="New prompt")
-        self.prompt_box_label.grid(column=0, row=1)
+        self.prompt_box_label.grid(column=1, row=5)
 
         self.prompt_box = tk.Text(self.base_frame, width=60, height=1, wrap="none")
-        self.prompt_box.grid(column=1, row=1)
+        self.prompt_box.grid(column=2, row=5)
 
         self.answer_box_label = ttk.Label(self.base_frame, text="New answer")
-        self.answer_box_label.grid(column=0, row=2)
+        self.answer_box_label.grid(column=1, row=6)
 
         self.answer_box = tk.Text(self.base_frame, width=60, height=2, wrap="word")
-        self.answer_box.grid(column=1, row=2)
+        self.answer_box.grid(column=2, row=6)
+
+    def display_topics_from_file(self, fname):
+        """Create a listbox containing the topics from a selected file.
+
+        Executed as a binding on ListboxSeletion event.
+
+        Args:
+            fname: The file that has been selected.
+        """
+
+        label = ttk.Label(self.base_frame, text="List selection works.")
+        label.grid(column=2, row=3)
 
 
 class MainApp:
