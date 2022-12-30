@@ -16,10 +16,10 @@ def get_files_test():
     try:
         print("Testing get_files(dir)")
 
-        directory = Path.cwd()
-        flist = handle_json.get_files(directory)
+        directory = Path(Path.cwd())
+        flist = handle_json.get_files(directory, extension=True)
 
-        actual_files = ["test_handle_json.py"]
+        actual_files = []
         print(f"Returned: {flist}")
         print(f"Comparing to {actual_files}")
 

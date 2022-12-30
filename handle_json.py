@@ -43,6 +43,10 @@ def get_files(directory, extension=True, blacklist=[], whitelist=[]):
     for file in directory.iterdir():
         fname = Path(file).name
 
+        if file.is_dir():
+            print(f"{fname} is a directory, not adding")
+            continue
+
         if fname[0] == ".":
             continue
 
