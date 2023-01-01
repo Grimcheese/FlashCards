@@ -569,16 +569,23 @@ class CreateTopicFrame(BasicFrame):
         Args:
             main_app: The parent window the frame sits witin.
         """
+
+        self.file_select_frame = ttk.Frame(self.base_frame)
+        self.file_select_frame.grid(column=1, row=1)
+
         # Choose the file
-        self.files_label = ttk.Label(self.base_frame, text="File")
+        self.files_label = ttk.Label(self.file_select_frame, text="Files")
         self.files_label.grid(column=1, row=3)
 
         files = handle_json.get_files(Path(Path.cwd(), "resources"))
         files_var = tk.StringVar(value=files)
 
+        self.topics_label = ttk.Label(self.file_select_frame, text="Topics")
+        self.topics_label.grid(column=2, row=3)
+
         # List box and bindings
         self.file_listbox = tk.Listbox(
-            self.base_frame, listvariable=files_var, height=5
+            self.file_select_frame, listvariable=files_var, height=5
         )
         self.file_listbox.grid(column=1, row=4)
 
@@ -587,6 +594,11 @@ class CreateTopicFrame(BasicFrame):
             lambda f: self.display_topics_from_file(self.file_listbox.curselection()),
         )
 
+        topics_var = tk.StringVar()
+        self.topic_listbox = tk.Listbox(
+            self.file_select_frame, listvariable=topics_var, height=5
+        )
+        self.topic_listbox.grid(column=2, row=4)
         # Choose the topic from the file
 
         self.prompt_box_label = ttk.Label(self.base_frame, text="New prompt")
@@ -601,7 +613,7 @@ class CreateTopicFrame(BasicFrame):
         self.answer_box = tk.Text(self.base_frame, width=60, height=2, wrap="word")
         self.answer_box.grid(column=2, row=6)
 
-    def display_topics_from_file(self, fname):
+    def display_topics_from_file(self, file_index):
         """Create a listbox containing the topics from a selected file.
 
         Executed as a binding on ListboxSeletion event.
@@ -610,8 +622,17 @@ class CreateTopicFrame(BasicFrame):
             fname: The file that has been selected.
         """
 
-        label = ttk.Label(self.base_frame, text="List selection works.")
+        file_index = file_index[0]
+        label = ttk.Label(self.base_frame, text=file_index)
         label.grid(column=2, row=3)
+
+        files = handle_json.get_files(Path.cwd(), "resources")
+
+        # Find topics from file
+        # fpath = Path.joinpath(Path.cwd(), "resources", files[file_index])
+        # file_obj = handle_json(fpath)
+
+        # Set Listbox stringvar to list of topics
 
 
 class MainApp:
