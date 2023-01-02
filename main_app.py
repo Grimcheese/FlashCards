@@ -594,9 +594,9 @@ class CreateTopicFrame(BasicFrame):
             lambda f: self.display_topics_from_file(self.file_listbox.curselection()),
         )
 
-        topics_var = tk.StringVar()
+        self.topics_var = tk.StringVar()
         self.topic_listbox = tk.Listbox(
-            self.file_select_frame, listvariable=topics_var, height=5
+            self.file_select_frame, listvariable=self.topics_var, height=5
         )
         self.topic_listbox.grid(column=2, row=4)
         # Choose the topic from the file
@@ -619,20 +619,26 @@ class CreateTopicFrame(BasicFrame):
         Executed as a binding on ListboxSeletion event.
 
         Args:
-            fname: The file that has been selected.
+            file_index: Result of curselection() of the file listbox. Will
+                give a tuple where the first element is the index of the
+                currently selected file.
         """
 
-        file_index = file_index[0]
+        file_index = file_index[0]  # Only interested in first element of tuple
         label = ttk.Label(self.base_frame, text=file_index)
         label.grid(column=2, row=3)
+        files = handle_json.get_files(Path(Path.cwd(), "resources"))
 
-        files = handle_json.get_files(Path.cwd(), "resources")
+        chosen_file = files[file_index]
+        print(chosen_file)
 
         # Find topics from file
-        # fpath = Path.joinpath(Path.cwd(), "resources", files[file_index])
-        # file_obj = handle_json(fpath)
+        fpath = Path.joinpath(Path.cwd(), "resources", chosen_file)
+        print(fpath)
+        file_obj = JSONTopicHandler(fpath)
 
         # Set Listbox stringvar to list of topics
+        self.topics_var.set(file_obj.topics)
 
 
 class MainApp:
