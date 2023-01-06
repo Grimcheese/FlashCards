@@ -70,16 +70,11 @@ class IntroFrame(BasicFrame):
         self.build_intro_screen()
 
     def build_intro_screen(self):
-        """Define and place the widgets for the intro screen.
-
-        Reads the label to be displayed from a JSON file called gui_reference.json
-        """
-
-        gui_reference_data = JSONHandler.get_js("gui_reference.json")
+        """Define and place the widgets for the intro screen."""
 
         self.intro_label = ttk.Label(
             master=self.base_frame,
-            text=gui_reference_data["intro_frame"][0]["main_text"],
+            text="Welcome to FlashCards! FlashCards is an interactive study aid. You can press any key to continue to topic selection!",
         )
         self.intro_label.grid(column=0, row=0)
 
