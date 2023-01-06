@@ -234,7 +234,8 @@ class TopicSelectFrame(BasicFrame):
 
         self.next_screen_button = ttk.Button(
             master=self.base_frame,
-            text="Run prompts from selected topic/s",
+            text="Run prompts",
+            width=20,
             command=lambda: self.to_display_prompts_frame(main_app),
             state=tk.DISABLED,
         )
@@ -249,7 +250,20 @@ class TopicSelectFrame(BasicFrame):
         self.previous_frame_button.grid(column=0, row=0)
 
         topic_row = self.make_topic_buttons()
-        self.next_screen_button.grid(column=0, row=topic_row + 1)
+        self.next_screen_button.grid(column=1, row=topic_row + 3)
+
+        self.select_all_button = ttk.Button(
+            self.base_frame, text="Select all", width=20, command=self.select_all_topics
+        )
+        self.select_all_button.grid(column=1, row=topic_row + 1, pady=[4, 0])
+
+        self.deselect_all_button = ttk.Button(
+            self.base_frame,
+            text="Deselect all",
+            width=20,
+            command=self.deselect_all_topics,
+        )
+        self.deselect_all_button.grid(column=1, row=topic_row + 2)
 
     def to_display_prompts_frame(self, main_app):
         """Update the main_app window frame to the display prompts screen.
@@ -291,6 +305,20 @@ class TopicSelectFrame(BasicFrame):
             topic_row += 1
 
         return topic_row
+
+    def select_all_topics(self):
+        """Select all topics from the topic file."""
+
+        for topic in self.topic_file.topics:
+            if not (topic in self.topic_file.chosen_topics):
+                self.pick_topics(topic)
+
+    def deselect_all_topics(self):
+        """Deselect all topics from the topic file."""
+
+        for topic in self.topic_file.topics:
+            if topic in self.topic_file.chosen_topics:
+                self.pick_topics(topic)
 
     def pick_topics(self, selected_topic):
         """Update the list of selected topics with the selected_topic argument."""
