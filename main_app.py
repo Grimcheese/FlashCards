@@ -561,14 +561,24 @@ class CreateTopicFrame(BasicFrame):
 
         super().__init__(main_app.main_window)
 
-        self.build_create_topic_frame()
+        self.build_create_topic_frame(main_app)
 
-    def build_create_topic_frame(self):
+    def build_create_topic_frame(self, main_app):
         """Define and place widgets that make up the create topic frame.
 
         Args:
             main_app: The parent window the frame sits witin.
         """
+
+        # Program navigation header buttons
+        self.file_select_screen_button = ttk.Button(
+            self.base_frame,
+            text="File Select Screen",
+            command=lambda: main_app.update_current_screen(
+                main_app.choose_file_frame.S_INDEX, main_app.current_screen
+            ),
+        )
+        self.file_select_screen_button.grid(column=1, row=0)
 
         self.file_select_frame = ttk.Frame(self.base_frame)
         self.file_select_frame.grid(column=1, row=1)
