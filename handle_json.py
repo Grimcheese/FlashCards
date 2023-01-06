@@ -22,10 +22,11 @@ from pathlib import Path
 # Module helper functions
 
 
-def get_files(directory, extension=True, blacklist=[], whitelist=[]):
+def get_files(directory, extension=True, find_json=True, blacklist=[], whitelist=[]):
     """Get a list of the names of each file in a given directory.
 
-    Ignores directories and hidden files. Assumes that
+    Ignores directories and hidden files. Default behaviour is to only return
+    .json files.
 
     Args:
         directory: A pathlib Path containing the location of desired files.
@@ -42,6 +43,15 @@ def get_files(directory, extension=True, blacklist=[], whitelist=[]):
     found_files = []
     for file in directory.iterdir():
         fname = Path(file).name
+
+        if find_json:
+            try:
+                JSONTopicHandler(file)
+
+                if file.suffix != ".json":
+                    continue
+            except json.decoder.JSONDecodeError:
+                continue
 
         if file.is_dir():
             print(f"{fname} is a directory, not adding")
