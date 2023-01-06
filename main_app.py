@@ -595,7 +595,10 @@ class CreateTopicFrame(BasicFrame):
 
         # List box and bindings
         self.file_listbox = tk.Listbox(
-            self.file_select_frame, listvariable=files_var, height=5
+            self.file_select_frame,
+            listvariable=files_var,
+            height=5,
+            exportselection=False,
         )
         self.file_listbox.grid(column=1, row=4)
 
@@ -606,7 +609,10 @@ class CreateTopicFrame(BasicFrame):
 
         self.topics_var = tk.StringVar()
         self.topic_listbox = tk.Listbox(
-            self.file_select_frame, listvariable=self.topics_var, height=5
+            self.file_select_frame,
+            listvariable=self.topics_var,
+            height=5,
+            exportselection=False,
         )
         self.topic_listbox.grid(column=2, row=4)
         # Choose the topic from the file
@@ -631,7 +637,7 @@ class CreateTopicFrame(BasicFrame):
         Args:
             file_index: Result of curselection() of the file listbox. Will
                 give a tuple where the first element is the index of the
-                currently selected file.
+                currently selected file from self.file_listbox.
         """
 
         file_index = file_index[0]  # Only interested in first element of tuple
