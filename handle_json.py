@@ -212,22 +212,37 @@ class JSONTopicHandler(JSONHandler):
 
         return self.all_prompts
 
-    def prompts_from_topic(self, search_topic):
-        """Adds the prompts from a specific topic to the all_prompts attribute.
+    def prompts_from_topic(self, search_topic, set_all_prompts=True):
+        """Finds prompts from a topic in the topic file.
 
-        Modifies the class attribute all_prompts by adding a new element containing
-        each prompt from the searched topic that is stored in the JSON string
-        this object represents.
+        The default functionality is to modify the class attribute all_prompts
+        by adding a new element containing each prompt from the searched topic
+        that is stored in the JSON string this object represents. It also returns
+        a new list containing all the found prompts
 
         Args:
             search_topic: A string with the name of the topic you want the prompts
                 from.
+            set_all_prompts: A flag that changes whether the all_prompts value
+                should be modified or not. By default this is set to True to
+                preserve older functionality and other uses throughout the program.
+                New calls to this method should set this to False unless it is
+                necessary.
+
+        Returns: A list of all the prompts that have been found in the search_topic.
         """
+
+        found_prompts = []
         for topics in self.raw_string:
             if topics["topic_name"] == search_topic:
                 # found topic
                 for prompt in topics["prompts"]:
-                    self.all_prompts.append(prompt)
+                    found_prompts.append(prompt)
+
+                    if set_all_prompts:
+                        self.all_prompts.append(prompt)
+
+        return found_prompts
 
     def topic_string(self, modifier=0):
         """Displays topics for debugging/logging purposes."""
