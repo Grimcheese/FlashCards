@@ -617,7 +617,7 @@ class CreateTopicFrame(BasicFrame):
         self.topic_listbox.grid(column=2, row=4)
 
         # Text field that displays formatted contents of the file/topic
-        self.file_text = tk.Text(self.base_frame, width=95, height=20)
+        self.file_text = tk.Text(self.base_frame, state="disabled", width=95, height=20)
         self.file_text.grid(pady=8, padx=(10, 0), column=1, row=3, columnspan=10)
 
         self.text_scrollbar = ttk.Scrollbar(
@@ -640,20 +640,21 @@ class CreateTopicFrame(BasicFrame):
         self.answer_box.grid(column=2, row=6)
 
     def display_topics_from_file(self, file_index):
-        """Create a listbox containing the topics from a selected file.
+        """Populate the topics listbox with topics from the selected file.
 
-        Executed as a binding on ListboxSeletion event.
+        Bound to <<ListboxSeletion>> events.
 
         Args:
-            file_index: Result of curselection() of the file listbox. Will
+            file_index: Return value of curselection() of the file listbox. Will
                 give a tuple where the first element is the index of the
                 currently selected file from self.file_listbox.
         """
 
+        # Select chosen file from files in resources directory
         file_index = file_index[0]  # Only interested in first element of tuple
         files = handle_json.get_files(Path(Path.cwd(), "resources"))
-
         chosen_file = files[file_index]
+
         print(chosen_file)
 
         # Find topics from file
@@ -661,8 +662,29 @@ class CreateTopicFrame(BasicFrame):
         print(fpath)
         file_obj = JSONTopicHandler(fpath)
 
+        # Create formatted string containing topics and place in text field
+        formatted_topic_string = self.formatted_file_output(file_obj)
+        self.file_text.configure(state="normal")
+        self.file_text.delete("1.0", "end")
+        self.file_text.insert("end", formatted_topic_string)
+        self.file_text.configure(state="disabled")
+
         # Set Listbox stringvar to list of topics
         self.topics_var.set(file_obj.topics)
+
+    def formatted_file_output(self, file):
+        """Takes a topic file and returns a string with the contents formatted."""
+
+        formatted_string = f"{file.fname} topic file\n"
+
+        for topic in file.topics:
+            topic_string = f"{topic}\n"
+            prompts = file.prompts_from_topic(topic)
+            for prompt in prompts:
+                topic_string = f"{topic_string}\tPrompt: {prompt['prompt']}\n"
+                topic_string = f"{topic_string}\tAnswer: {prompt['answer']}\n\n"
+            formatted_string = f"{formatted_string}{topic_string}"
+        return formatted_string
 
 
 class MainApp:
