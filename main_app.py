@@ -593,7 +593,7 @@ class CreateTopicFrame(BasicFrame):
         self.topics_label = ttk.Label(self.file_select_frame, text="Topics")
         self.topics_label.grid(column=2, row=3)
 
-        # List box and bindings
+        # List box and bindings - display files and topics from file in listbox
         self.file_listbox = tk.Listbox(
             self.file_select_frame,
             listvariable=files_var,
@@ -615,18 +615,28 @@ class CreateTopicFrame(BasicFrame):
             exportselection=False,
         )
         self.topic_listbox.grid(column=2, row=4)
-        # Choose the topic from the file
 
+        # Text field that displays formatted contents of the file/topic
+        self.file_text = tk.Text(self.base_frame, width=95, height=20)
+        self.file_text.grid(pady=8, padx=(10, 0), column=1, row=3, columnspan=10)
+
+        self.text_scrollbar = ttk.Scrollbar(
+            self.base_frame, orient=tk.VERTICAL, command=self.file_text.yview
+        )
+        self.text_scrollbar.grid(pady=8, column=11, row=3, sticky=(tk.N, tk.S))
+        self.file_text.configure(yscrollcommand=self.text_scrollbar.set)
+
+        # New prompt and answer submission to the selected file and topic
         self.prompt_box_label = ttk.Label(self.base_frame, text="New prompt")
         self.prompt_box_label.grid(column=1, row=5)
 
-        self.prompt_box = tk.Text(self.base_frame, width=60, height=1, wrap="none")
+        self.prompt_box = tk.Text(self.base_frame, width=50, height=1, wrap="none")
         self.prompt_box.grid(column=2, row=5)
 
         self.answer_box_label = ttk.Label(self.base_frame, text="New answer")
         self.answer_box_label.grid(column=1, row=6)
 
-        self.answer_box = tk.Text(self.base_frame, width=60, height=2, wrap="word")
+        self.answer_box = tk.Text(self.base_frame, width=50, height=2, wrap="word")
         self.answer_box.grid(column=2, row=6)
 
     def display_topics_from_file(self, file_index):
@@ -641,8 +651,6 @@ class CreateTopicFrame(BasicFrame):
         """
 
         file_index = file_index[0]  # Only interested in first element of tuple
-        label = ttk.Label(self.base_frame, text=file_index)
-        label.grid(column=2, row=3)
         files = handle_json.get_files(Path(Path.cwd(), "resources"))
 
         chosen_file = files[file_index]
