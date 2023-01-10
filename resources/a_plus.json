@@ -1,0 +1,179 @@
+[
+    {
+        "topic_name": "Acronyms/Definitions",
+        "prompts": [
+            {
+                "prompt": "What is SO-DIMM?",
+                "answer": "Small Outline DUal In-Line Memory Module."
+            },
+            {
+                "prompt": "What is HDD?",
+                "answer": "Hard Disk Drive."
+            },
+            {
+                "prompt": "What is a SSD?",
+                "answer": "Solid State Disk"
+            },
+            {
+                "prompt": "What is SATA?",
+                "answer": "Serial - ATA."
+            },
+            {
+                "prompt": "What is a LAN?",
+                "answer": "Local Area Network."
+            },
+            {
+                "prompt": "What is a PAN?",
+                "answer": "Personal Area Network."
+            },
+            {
+                "prompt": "What is NFC?",
+                "answer": "Near Field Communication"
+            },
+            {
+                "prompt": "What is MDM?",
+                "answer": "Mobile Device Management. Centralised management software for mobile devices running on a corporate network."
+            }
+        ]
+    },
+    {
+        "topic_name": "Computer Networks",
+        "prompts": [
+            {
+                "prompt": "What is the difference between TCP and UDP?",
+                "answer": "TCP (Transmission Control Protocol) is a connection oriented protocol that ensures delivery of packets. UDP (User Datagram Protocol) is not connection oriented and simply sends packets with no guarantee that they have arrived."
+            }
+        ]
+    },
+    {
+        "topic_name": "Network Protocols and Ports",
+        "prompts": [
+            {
+                "prompt": "What is FTP?",
+                "answer": "File Transfer Protocol. Uses TCP ports 20 (data) and 21 (control). Transfers data between systems and can authenticate with a username and password."
+            },
+            {
+                "prompt": "What is SSH?",
+                "answer": "Secure Shell. Uses TCP port 22. A shell that can communicate with remote systems that uses encryption to protect data transferred."
+            },
+            {
+                "prompt": "What is Telnet?",
+                "answer": "Telecommunication Network. Uses TCP port 23. Allows remote login to a device. Communication is in plain text and is not secure."
+            },
+            {
+                "prompt": "What is SMTP?",
+                "answer": "Simple Mail Transfer Protocol. Uses TCP port 25. Protocol used to allow mail servers to transfer emails between each other or devices to a mail server.  "
+            },
+            {
+                "prompt": "What is DNS?",
+                "answer": "Domain Name System. Uses UDP port 53. Protocol that converts domain names to a corresponding IP address."
+            },
+            {
+                "prompt": "What is DHCP?",
+                "answer": "Dynamic Host Configuration Protocol. Uses UDP ports 67 and 68. Automated configuration of IP, subnet, dns for a host on a network. Can be dynamically allocated from a pool or have IP addresses reserved for a given MAC address."
+            },
+            {
+                "prompt": "What is a MAC address?",
+                "answer": "Media Access Controll Address. A unique identifier tied to a network interface."
+            },
+            {
+                "prompt": "What is HTTP/HTTPS?",
+                "answer": "HyperText Transfer Protocol/Secure. Uses TCP port 80 (secure is 443).How web browsers transfer data such as HTML files."
+            },
+            {
+                "prompt": "What is POP3/IMAP?",
+                "answer": "Post Office Protocol (TCP 110)/ Internet Message Access Protocol(TCP 143). Protocol to receive emails from a mail server."
+            },
+            {
+                "prompt": "What is SMB?",
+                "answer": "Server Message Block. Uses NetBIOS over TCP/IP (UDP 137, TCP 139) or direct over TCP 445. File and device sharing protocol used by Microsoft Windows."
+            },
+            {
+                "prompt": "What is SNMP?",
+                "answer": "Simple Network Management Protocol. Uses UDP 161 and 162. Protocol used to gather statistics from network devices."
+            },
+            {
+                "prompt": "What is LDAP?",
+                "answer": "Lightweight Directory Access Protocol. Uses TCP port 389. Used to store and retrieve information in a network directory."
+            },
+            {
+                "prompt": "What is RDP?",
+                "answer": "Remote Desktop Protocol. Uses TCP port 3389. Protocol used for remote access to a computers desktop."
+            },
+            {
+                "prompt": "What is STP?",
+                "answer": "Spanning Tree Protocol. A method of finding a route between a source and destination on a network. Used when multiple links are available which allows for redundant network designs."
+            },
+            {
+                "prompt": "What is DOCSIS?",
+                "answer": "Data Over Cable Service Interface Specification. Data provided over a cable network using a cable modem."
+            }
+        ]
+    },
+    {
+        "topic_name": "Wireless Network Standards",
+        "prompts": [
+            {
+                "prompt": "What is the base wireless network standard?",
+                "answer": "802.11. Is updated over time and various versions of this standard have been released (a, b, g, n, ac, ax)."
+            },
+            {
+                "prompt": "What are the properties of 802.11a?",
+                "answer": "Original wireless standard that operates in the 5GHz range. Speeds of up to 54 Mb/s. Has a smaller range than 802.11b but less interference."
+            },
+            {
+                "prompt": "What are the properties of 802.11.b?",
+                "answer": "Original wireless standard that operates in the 2.4GHz range. Speeds of up to 11Mb/s. Has a higher range than 802.11a but has more interference from other household devices that also operate in the 2.4GHz range."
+            },
+            {
+                "prompt": "What are the properties of 802.11g?",
+                "answer": "802.11.g is an upgrade to 802.11b. It operates in the 2.4GHz range so has the same conflict problems as 802.11b. Has speeds up to 54Mb/s but is also backwards compatible with 802.11b."
+            },
+            {
+                "prompt": "What are the properties of 802.11n?",
+                "answer": "802.11n (also known as WiFi 4) is the upgrade to the a,b, and g protocols. Can work in both 5GHz and 2.4GHz ranges. Can reach speeds of up to 600Mb/s by utilising MIMO technology (Multiple input multiple output)."
+            },
+            {
+                "prompt": "What are the properties of 802.11ac?",
+                "answer": "802.11ac (also known as WiFi 5) is the upgraded version of 802.11n. It operates in the 5GHz which allows for greater channel bandwidth. Uses 8 MU-MIMO streams to reach nearly 7Gb/s speeds."
+            },
+            {
+                "prompt": "What are the properties of 802.11ax?",
+                "answer": "The 6th iteration of WiFi protocols is the upgrade to 802.11ac. Can operate at 5GHz or 2.4GHz. Uses Bi-directional MU-MIMO streams with 1201 Mb/s speeds on each channel. Utilises OFDMA which is a technology similar to cellular communication."
+            }
+        ]
+    },
+    {
+        "topic_name": "Cell Standards",
+        "prompts": [
+            {
+                "prompt": "What standards does 2G technology support?",
+                "answer": "GSM and CDMA."
+            },
+            {
+                "prompt": "What is GSM?",
+                "answer": "Global System for Mobile Communications. A mobile networking standard that uses multiplexing to separate calls - Everyone gets a little slice of time. Originally used mainly in Europe or by AT&T in US."
+            },
+            {
+                "prompt": "What is CDMA?",
+                "answer": "Code Division Multiple Access. A mobile networking standard where each communication session has its own code to distinguish it."
+            },
+            {
+                "prompt": "What standards does 3g technology support?",
+                "answer": "3G gives improved speed over 2G. This extra speed allows for new functionality such as GPS, mobile streaming, etc. "
+            },
+            {
+                "prompt": "What are the benefits of 4G technology?",
+                "answer": "4G is also known as LTE or Long Term Evolution. Combines the GSM and CDMA standards. Has a standard download speed of 150Mb/s or with LTE-Advanced 300Mb/s."
+            },
+            {
+                "prompt": "What defines 5G technology?",
+                "answer": "Significant performance improvements over 4G that works by using higher frequencies. Low end of speed goes from 100-900Mb/s to future speeds of up to 10Gb/s."
+            },
+            {
+                "prompt": "What is GPS?",
+                "answer": "Global Positioning System. Technology that utilises satellites in space to find the precise location of a device."
+            }
+        ]
+    }
+]
