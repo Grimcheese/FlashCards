@@ -591,7 +591,7 @@ class CreateTopicFrame(BasicFrame):
         files_var = tk.StringVar(value=files)
 
         self.topics_label = ttk.Label(self.file_select_frame, text="Topics")
-        self.topics_label.grid(column=2, row=3)
+        self.topics_label.grid(column=3, row=3)
 
         # List box and bindings - display files and topics from file in listbox
         self.file_listbox = tk.Listbox(
@@ -601,6 +601,12 @@ class CreateTopicFrame(BasicFrame):
             exportselection=False,
         )
         self.file_listbox.grid(column=1, row=4)
+
+        self.list_bar1 = ttk.Scrollbar(
+            self.file_select_frame, orient=tk.VERTICAL, command=self.file_listbox.yview
+        )
+        self.list_bar1.grid(column=2, row=4, sticky=(tk.N, tk.S))
+        self.file_listbox["yscrollcommand"] = self.list_bar1.set
 
         self.file_listbox.bind(
             "<<ListboxSelect>>",
@@ -614,8 +620,14 @@ class CreateTopicFrame(BasicFrame):
             height=5,
             exportselection=False,
         )
-        self.topic_listbox.grid(column=2, row=4)
+        self.topic_listbox.grid(column=3, row=4)
 
+        self.list_bar2 = ttk.Scrollbar(
+            self.file_select_frame, orient=tk.VERTICAL, command=self.topic_listbox.yview
+        )
+        self.list_bar2.grid(column=4, row=4, sticky=(tk.N, tk.S))
+        self.topic_listbox['yscrollcommand'] = self.list_bar2.set
+        
         # Text field that displays formatted contents of the file/topic
         self.file_text = tk.Text(self.base_frame, state="disabled", width=95, height=20)
         self.file_text.grid(pady=8, padx=(10, 0), column=1, row=3, columnspan=10)
