@@ -570,6 +570,8 @@ class CreateTopicFrame(BasicFrame):
             main_app: The parent window the frame sits witin.
         """
 
+        self.selected_file = None
+
         # Program navigation header buttons
         self.file_select_screen_button = ttk.Button(
             self.base_frame,
@@ -610,7 +612,7 @@ class CreateTopicFrame(BasicFrame):
 
         self.file_listbox.bind(
             "<<ListboxSelect>>",
-            lambda f: self.display_topics_from_file(self.file_listbox.curselection()),
+            lambda f: self.display_file(self.file_listbox.curselection()),
         )
 
         self.topics_var = tk.StringVar()
@@ -626,10 +628,17 @@ class CreateTopicFrame(BasicFrame):
             self.file_select_frame, orient=tk.VERTICAL, command=self.topic_listbox.yview
         )
         self.list_bar2.grid(column=4, row=4, sticky=(tk.N, tk.S))
-        self.topic_listbox['yscrollcommand'] = self.list_bar2.set
-        
+        self.topic_listbox["yscrollcommand"] = self.list_bar2.set
+
+        self.topic_listbox.bind(
+            "<<ListboxSelect>>",
+            lambda f: self.display_topics_from_file(self.topic_listbox.curselection()),
+        )
+
         # Text field that displays formatted contents of the file/topic
-        self.file_text = tk.Text(self.base_frame, state="disabled", width=95, height=20)
+        self.file_text = tk.Text(
+            self.base_frame, state="disabled", width=95, height=20, wrap="word"
+        )
         self.file_text.grid(pady=8, padx=(10, 0), column=1, row=3, columnspan=10)
 
         self.text_scrollbar = ttk.Scrollbar(
@@ -651,8 +660,12 @@ class CreateTopicFrame(BasicFrame):
         self.answer_box = tk.Text(self.base_frame, width=50, height=2, wrap="word")
         self.answer_box.grid(column=2, row=6)
 
-    def display_topics_from_file(self, file_index):
-        """Populate the topics listbox with topics from the selected file.
+    def build_text_box(self, main_app):
+        """"""
+
+    def display_file(self, file_index):
+        """Populate the topics listbox and the text box with selected file's
+        contents.
 
         Bound to <<ListboxSeletion>> events.
 
@@ -662,27 +675,68 @@ class CreateTopicFrame(BasicFrame):
                 currently selected file from self.file_listbox.
         """
 
-        # Select chosen file from files in resources directory
-        file_index = file_index[0]  # Only interested in first element of tuple
-        files = handle_json.get_files(Path(Path.cwd(), "resources"))
-        chosen_file = files[file_index]
+        try:
+            # Select chosen file from files in resources directory
+            file_index = file_index[0]  # Only interested in first element of tuple
+            files = handle_json.get_files(Path(Path.cwd(), "resources"))
+            chosen_file = files[file_index]
 
-        print(chosen_file)
+            # Find topics from file
+            fpath = Path.joinpath(Path.cwd(), "resources", chosen_file)
+            print(f"Selected file: {fpath}")
+            self.selected_file = JSONTopicHandler(fpath)
 
-        # Find topics from file
-        fpath = Path.joinpath(Path.cwd(), "resources", chosen_file)
-        print(fpath)
-        file_obj = JSONTopicHandler(fpath)
+            # Create formatted string containing topics and place in text field
+            formatted_topic_string = self.formatted_file_output(self.selected_file)
+            self.file_text.configure(state="normal")
+            self.file_text.delete("1.0", "end")
+            self.file_text.insert("end", formatted_topic_string)
+            self.file_text.configure(state="disabled")
 
-        # Create formatted string containing topics and place in text field
-        formatted_topic_string = self.formatted_file_output(file_obj)
-        self.file_text.configure(state="normal")
-        self.file_text.delete("1.0", "end")
-        self.file_text.insert("end", formatted_topic_string)
-        self.file_text.configure(state="disabled")
+            # Set Listbox stringvar to list of topics
+            self.topics_var.set(self.selected_file.topics)
+        except ValueError:
+            # Handle situation where list box is unselected
+            return
 
-        # Set Listbox stringvar to list of topics
-        self.topics_var.set(file_obj.topics)
+    def display_topics_from_file(self, topic_index):
+        """Populate the text box with the selected topic.
+
+        Bound to <<ListboxSelection>> event on topic_listbox
+        """
+
+        # Get topic string from topic_index
+        try:
+            topic_index = topic_index[0]
+            topic_name = self.selected_file.topics[topic_index]
+
+            print(f"Selected topic: {topic_name}")
+            topic_string = self.formatted_topic_output(self.selected_file, topic_name)
+
+            # Set text box
+            self.file_text.configure(state="normal")
+            self.file_text.delete("1.0", "end")
+            self.file_text.insert("end", topic_string)
+            self.file_text.configure(state="disabled")
+        except ValueError:
+            # Handle situation where list box is unselected
+            return
+
+    def formatted_topic_output(self, file, topic):
+        """Search a topic file and return a formatted string containing a topic.
+
+        Args:
+            file: A JSONTopicHandler object that contains the file to be searched.
+            topic: A string specifying the topic to be searched for.
+        """
+
+        topic_string = f"{topic}\n"
+        prompts = file.prompts_from_topic(topic)
+        for prompt in prompts:
+            topic_string = f"{topic_string}\tPrompt: {prompt['prompt']}\n"
+            topic_string = f"{topic_string}\tAnswer: {prompt['answer']}\n\n"
+
+        return topic_string
 
     def formatted_file_output(self, file):
         """Takes a topic file and returns a string with the contents formatted."""
@@ -690,11 +744,7 @@ class CreateTopicFrame(BasicFrame):
         formatted_string = f"{file.fname} topic file\n"
 
         for topic in file.topics:
-            topic_string = f"{topic}\n"
-            prompts = file.prompts_from_topic(topic)
-            for prompt in prompts:
-                topic_string = f"{topic_string}\tPrompt: {prompt['prompt']}\n"
-                topic_string = f"{topic_string}\tAnswer: {prompt['answer']}\n\n"
+            topic_string = self.formatted_topic_output(file, topic)
             formatted_string = f"{formatted_string}{topic_string}"
         return formatted_string
 
