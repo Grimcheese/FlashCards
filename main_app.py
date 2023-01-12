@@ -561,6 +561,7 @@ class CreateTopicFrame(BasicFrame):
 
         super().__init__(main_app.main_window)
 
+        self.selected_file = None
         self.build_create_topic_frame(main_app)
 
     def build_create_topic_frame(self, main_app):
@@ -570,7 +571,17 @@ class CreateTopicFrame(BasicFrame):
             main_app: The parent window the frame sits witin.
         """
 
-        self.selected_file = None
+        # Frame for contents below the header (self.base_frame)
+        self.file_select_frame = ttk.Frame(self.base_frame)
+        self.file_select_frame.grid(column=1, row=1)
+
+        self.build_header(main_app)
+        self.build_list_boxes(main_app)
+        self.build_text_box(main_app)
+        self.build_new_topics(main_app)
+
+    def build_header(self, main_app):
+        """Define the widgets for menu/header functions."""
 
         # Program navigation header buttons
         self.file_select_screen_button = ttk.Button(
@@ -582,8 +593,8 @@ class CreateTopicFrame(BasicFrame):
         )
         self.file_select_screen_button.grid(column=1, row=0)
 
-        self.file_select_frame = ttk.Frame(self.base_frame)
-        self.file_select_frame.grid(column=1, row=1)
+    def build_list_boxes(self, main_app):
+        """Define the list box widgets and the Vars required for them."""
 
         # Choose the file
         self.files_label = ttk.Label(self.file_select_frame, text="Files")
@@ -635,6 +646,9 @@ class CreateTopicFrame(BasicFrame):
             lambda f: self.display_topics_from_file(self.topic_listbox.curselection()),
         )
 
+    def build_text_box(self, main_app):
+        """Define the widgets and functions for the main text box."""
+
         # Text field that displays formatted contents of the file/topic
         self.file_text = tk.Text(
             self.base_frame, state="disabled", width=95, height=20, wrap="word"
@@ -646,6 +660,9 @@ class CreateTopicFrame(BasicFrame):
         )
         self.text_scrollbar.grid(pady=8, column=11, row=3, sticky=(tk.N, tk.S))
         self.file_text.configure(yscrollcommand=self.text_scrollbar.set)
+
+    def build_new_topics(self, main_app):
+        """Define the new prompt widgets."""
 
         # New prompt and answer submission to the selected file and topic
         self.prompt_box_label = ttk.Label(self.base_frame, text="New prompt")
@@ -659,9 +676,6 @@ class CreateTopicFrame(BasicFrame):
 
         self.answer_box = tk.Text(self.base_frame, width=50, height=2, wrap="word")
         self.answer_box.grid(column=2, row=6)
-
-    def build_text_box(self, main_app):
-        """"""
 
     def display_file(self, file_index):
         """Populate the topics listbox and the text box with selected file's
