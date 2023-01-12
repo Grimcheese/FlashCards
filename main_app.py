@@ -23,6 +23,8 @@ Classes:
 """
 import tkinter as tk
 from tkinter import ttk
+from tkinter import font
+
 import json
 
 from handle_json import JSONHandler
