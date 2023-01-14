@@ -746,11 +746,32 @@ class CreateTopicFrame(BasicFrame):
 
         topic_string = f"{topic}\n"
         prompts = file.prompts_from_topic(topic)
+        max_line_length = self.file_text["width"]
         for prompt in prompts:
-            topic_string = f"{topic_string}\tPrompt: {prompt['prompt']}\n"
-            topic_string = f"{topic_string}\tAnswer: {prompt['answer']}\n\n"
+            # topic_string = f"{topic_string}\tPrompt: {prompt['prompt']}\n"
+
+            # Check if prompt string will be longer than text box width
+            new_line = f'\tPrompt: {prompt["prompt"]}\n'.expandtabs()
+
+            if len(new_line) > max_line_length:
+                print(f"Detected long line in string: {new_line}")
+                new_line = f"{new_line[:max_line_length]}\t{new_line[max_line_length:]}"
+            topic_string = f"{topic_string}{new_line}"
+
+            # Check if answer string will be longer than text box width
+            new_line = f"\tAnswer: {prompt['answer']}\n\n".expandtabs()
+            if len(new_line) > max_line_length:
+                print(f"Detected long line in string: {new_line}")
+                new_line = (
+                    f"{new_line[:max_line_length]}\t\t{new_line[max_line_length:]}"
+                )
+            topic_string = f"{topic_string}{new_line}"
+            # topic_string = f"{topic_string}\tAnswer: {prompt['answer']}\n\n"
 
         return topic_string
+
+    def tab_large_line(self, in_string):
+        """Find if a string will display longer than the text box and add tabs."""
 
     def formatted_file_output(self, file):
         """Takes a topic file and returns a string with the contents formatted."""
