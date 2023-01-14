@@ -30,6 +30,7 @@ from handle_json import JSONHandler
 from handle_json import JSONTopicHandler
 
 from pathlib import Path
+import math, re
 
 
 class BasicFrame:
@@ -701,10 +702,9 @@ class CreateTopicFrame(BasicFrame):
             self.selected_file = JSONTopicHandler(fpath)
 
             # Create formatted string containing topics and place in text field
-            formatted_topic_string = self.formatted_file_output(self.selected_file)
             self.file_text.configure(state="normal")
             self.file_text.delete("1.0", "end")
-            self.file_text.insert("end", formatted_topic_string)
+            self.display_formatted_file(self.selected_file)
             self.file_text.configure(state="disabled")
 
             # Set Listbox stringvar to list of topics
@@ -722,21 +722,20 @@ class CreateTopicFrame(BasicFrame):
         # Get topic string from topic_index
         try:
             topic_index = topic_index[0]
-            topic_name = self.selected_file.topics[topic_index]
-
-            print(f"Selected topic: {topic_name}")
-            topic_string = self.formatted_topic_output(self.selected_file, topic_name)
-
-            # Set text box
-            self.file_text.configure(state="normal")
-            self.file_text.delete("1.0", "end")
-            self.file_text.insert("end", topic_string)
-            self.file_text.configure(state="disabled")
         except ValueError:
-            # Handle situation where list box is unselected
+            # Handle situation where topic_index will be None (unselected listbox)
             return
 
-    def formatted_topic_output(self, file, topic):
+        topic_name = self.selected_file.topics[topic_index]
+        print(f"Selected topic: {topic_name}")
+
+        # Set text box
+        self.file_text.configure(state="normal")
+        self.file_text.delete("1.0", "end")
+        self.display_formatted_topic(self.selected_file, topic_name)
+        self.file_text.configure(state="disabled")
+
+    def display_formatted_topic(self, file, topic):
         """Search a topic file and return a formatted string containing a topic.
 
         Args:
@@ -744,15 +743,26 @@ class CreateTopicFrame(BasicFrame):
             topic: A string specifying the topic to be searched for.
         """
 
-        topic_string = f"{topic}\n"
+        self.file_text.insert("end", f"{topic}\n")
+
         prompts = file.prompts_from_topic(topic)
         max_line_length = self.file_text["width"]
         for prompt in prompts:
-            # topic_string = f"{topic_string}\tPrompt: {prompt['prompt']}\n"
+            next_line = f"\tPrompt: {prompt['prompt']}\n"
+            next_line = self.tab_large_line(next_line)
+            self.file_text.insert("end", next_line)
 
+            next_line = f"\tAnswer: {prompt['answer']}\n\n"
+            next_line = self.tab_large_line(next_line)
+            self.file_text.insert("end", next_line)
+
+        """
             # Check if prompt string will be longer than text box width
             new_line = f'\tPrompt: {prompt["prompt"]}\n'.expandtabs()
+            new_line = self.tab_large_line(new_line)
+            topic_string = f"{topic_string}{new_line}"
 
+            new_line = f""
             if len(new_line) > max_line_length:
                 print(f"Detected long line in string: {new_line}")
                 new_line = f"{new_line[:max_line_length]}\t{new_line[max_line_length:]}"
@@ -767,21 +777,35 @@ class CreateTopicFrame(BasicFrame):
                 )
             topic_string = f"{topic_string}{new_line}"
             # topic_string = f"{topic_string}\tAnswer: {prompt['answer']}\n\n"
+            """
 
-        return topic_string
+    def tab_large_line(self, new_line):
+        """Find if a string will display longer than the text box and add tabs
+        to align text correctly.
+        """
 
-    def tab_large_line(self, in_string):
-        """Find if a string will display longer than the text box and add tabs."""
+        new_line = new_line.expandtabs()
+        MAX_LINE_LENGTH = self.file_text["width"]
+        if len(new_line) > MAX_LINE_LENGTH:
+            print(f"Detected long line in string: {new_line}")
+            lines = math.ceil(len(new_line) / MAX_LINE_LENGTH)
 
-    def formatted_file_output(self, file):
+            # Find last word before eol
+            if re.search("[ \w]", new_line[MAX_LINE_LENGTH]):
+                print(f"Char at eol: {new_line[MAX_LINE_LENGTH]}")
+                line_split = MAX_LINE_LENGTH
+                while new_line[line_split] is not " ":
+                    line_split = line_split - 1
+                new_line = f"{new_line[:line_split]}\n\t       {new_line[line_split:]}"
+
+        return new_line
+
+    def display_formatted_file(self, file):
         """Takes a topic file and returns a string with the contents formatted."""
 
-        formatted_string = f"{file.fname} topic file\n"
-
+        self.file_text.insert("end", f"{file.fname} topic file\n")
         for topic in file.topics:
-            topic_string = self.formatted_topic_output(file, topic)
-            formatted_string = f"{formatted_string}{topic_string}"
-        return formatted_string
+            self.display_formatted_topic(file, topic)
 
 
 class MainApp:
