@@ -727,11 +727,12 @@ class CreateTopicFrame(BasicFrame):
             return
 
         topic_name = self.selected_file.topics[topic_index]
-        print(f"Selected topic: {topic_name}")
+        print(f"Selected topic: {topic_name}, max width: {self.file_text['width']}")
 
         # Set text box
         self.file_text.configure(state="normal")
         self.file_text.delete("1.0", "end")
+        self.file_text.insert("end", f"{self.selected_file.fname} topic file\n")
         self.display_formatted_topic(self.selected_file, topic_name)
         self.file_text.configure(state="disabled")
 
@@ -786,17 +787,32 @@ class CreateTopicFrame(BasicFrame):
 
         new_line = new_line.expandtabs()
         MAX_LINE_LENGTH = self.file_text["width"]
+
+        # Line will be longer than width of text box and needs to be formatted
         if len(new_line) > MAX_LINE_LENGTH:
             print(f"Detected long line in string: {new_line}")
-            lines = math.ceil(len(new_line) / MAX_LINE_LENGTH)
+            line_index = 0
+            string_index = MAX_LINE_LENGTH - 1
+            while string_index < len(new_line):
+                print(f"String pointing at: {string_index}")
+                print(f"Line number: {line_index}")
+                print(f"Current length of string: {len(new_line)}")
 
-            # Find last word before eol
-            if re.search("[ \w]", new_line[MAX_LINE_LENGTH]):
-                print(f"Char at eol: {new_line[MAX_LINE_LENGTH]}")
-                line_split = MAX_LINE_LENGTH
-                while new_line[line_split] is not " ":
-                    line_split = line_split - 1
-                new_line = f"{new_line[:line_split]}\n\t       {new_line[line_split:]}"
+                # If pointing to a whitespace character
+                if new_line[string_index] == " ":
+                    new_line = f"{new_line[:string_index]}\n               {new_line[string_index:]}"
+                else:
+
+                    # Find location to split the line
+                    print(
+                        f"Char at eol: {new_line[string_index - 3: string_index + 3 ]}"
+                    )
+                    while new_line[string_index] != " ":
+                        string_index = string_index - 1
+                    new_line = f"{new_line[:string_index]}\n               {new_line[string_index:]}"
+
+                line_index = line_index + 1
+                string_index = string_index + MAX_LINE_LENGTH
 
         return new_line
 
