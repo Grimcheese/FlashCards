@@ -54,10 +54,12 @@ def get_files(directory, extension=True, find_json=True, blacklist=[], whitelist
                 continue
 
         if file.is_dir():
+            # file is a directory so does not need to be added
             print(f"{fname} is a directory, not adding")
             continue
 
         if fname[0] == ".":
+            # file begins with . denoting hidden status
             continue
 
         if extension == False:
@@ -121,11 +123,27 @@ class JSONHandler:
         return self.fname
 
     @classmethod
-    def get_js(cls, fname):
-        f = open(fname)
-        data = json.load(f)
+    def get_js(cls, fpath):
+        try:
+            with open(fpath, "r") as f:
+                data = json.load(f)
+        except json.JSONDecodeError:
+            # File does not contain valid json or does not exist
+            print(f"Invalid file: {fpath}")
+            raise
+        except FileNotFoundError:
+            print(f"File not found. Make one.")
+            raise
 
         return data
+
+    @classmethod
+    def make_empty_file(cls, fname):
+        empty_file = []
+        empty_obj = json.dumps(empty_file, indent=4)
+
+        with open(fname, "w") as f:
+            f.write(empty_obj)
 
 
 class JSONTopicHandler(JSONHandler):
@@ -317,6 +335,13 @@ class JSONTopicHandler(JSONHandler):
     def write_new_topic(self, new_topic):
         """Write a new, empty topic to the topic file."""
 
+        # Create the JSON string
+        topic_dict = {"topic_name": new_topic, "prompt": []}
+        topic_obj = json.dumps(topic_dict, indent=4)
+
+        with open(self.fpath, "w") as f:
+            f.write(topic_obj)
+
     def write_new_prompt(self, new_prompt, topic):
         """Write a new prompt to a given topic in the topic file."""
 
@@ -359,6 +384,9 @@ def run_module_tests():
         json_data.get_value(20, "prompt")
     except IndexError:
         print("There was an exception raised in the method")
+
+    print("Testing file writing.")
+    json_data.write_new_topic("test write")
 
 
 def schema_tests():
