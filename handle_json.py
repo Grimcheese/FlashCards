@@ -314,6 +314,12 @@ class JSONTopicHandler(JSONHandler):
 
         return topics
 
+    def write_new_topic(self, new_topic):
+        """Write a new, empty topic to the topic file."""
+
+    def write_new_prompt(self, new_prompt, topic):
+        """Write a new prompt to a given topic in the topic file."""
+
 
 # TODO: Move these to a separate module
 def run_module_tests():
