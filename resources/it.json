@@ -1,0 +1,28 @@
+[
+    {
+        "topic_name": "Acronyms",
+        "prompts": [
+            {
+                "prompt": "OWASP",
+                "answer": "Open Web Application Security Project"
+            },
+            {
+                "prompt": "HTML",
+                "answer": "HyperText Markup Language"
+            },
+            {
+                "prompt": "XXE",
+                "answer": "XML External Entity"
+            }
+        ]
+    },
+    {
+        "topic_name": "Cyber Attacks",
+        "prompt": [
+            {
+                "prompt": "XXE",
+                "answer": "XML External Entity. Use XML to directly refer to objects"
+            }
+        ]
+    }
+]
