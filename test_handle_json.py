@@ -50,9 +50,11 @@ def JSONHandler_test():
     print("Testing JSONHandler class")
     tested.append(name)
 
+    # Valid json file test
     valid_flashcard_file = "validate_file.json"
     file_obj1 = handle_json.JSONHandler(valid_flashcard_file)
 
+    # Invalid, non-json file test
     try:
         invalid_flashcard_file = "README.md"
         file_obj2 = handle_json.JSONHandler(invalid_flashcard_file)
@@ -61,6 +63,15 @@ def JSONHandler_test():
         failed.append(name)
     except json.JSONDecodeError:
         print("Correctly raised exception for non json file.")
+        """
+    # Invalid, json file test
+    try:
+        invalid_json_file = "invalidate_file.json"
+        file_obj3 = handle_json.JSONHandler(invalid_json_file)
+        
+        failed.append(name)
+    except 
+    """
 
 
 def results():

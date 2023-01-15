@@ -43,13 +43,11 @@ def get_files(directory, extension=True, find_json=True, blacklist=[], whitelist
     found_files = []
     for file in directory.iterdir():
         fname = Path(file).name
-        print(fname)
         if find_json:
             try:
                 if file.suffix != ".json":
                     continue
 
-                JSONTopicHandler(file)
             except (json.decoder.JSONDecodeError):
                 continue
 
@@ -69,6 +67,18 @@ def get_files(directory, extension=True, find_json=True, blacklist=[], whitelist
         found_files.append(fname)
 
     return found_files
+
+
+class InvalidFlashCardFile(Exception):
+    """An invalid file has been used to create a JSONTopicFile object.
+
+    Extends the Exception class
+    """
+
+    def __init__(self, message):
+        """Initialise exception object with a message to describe the error."""
+
+        super().__init__(message)
 
 
 class InvalidKeyError(Exception):
@@ -106,11 +116,12 @@ class JSONHandler:
         stored as a raw string.
 
         Args:
-            in_filepath: The file path for the JSON file to handle.
+            in_filepath: A string containing the file path for the JSON file to handle.
         """
 
         self.fpath = in_filepath
         self.fname = Path(in_filepath).name
+
         self.raw_string = JSONHandler.get_js(in_filepath)
 
     def output_string(self):
@@ -127,8 +138,9 @@ class JSONHandler:
         try:
             with open(fpath, "r") as f:
                 data = json.load(f)
+
         except json.JSONDecodeError:
-            # File does not contain valid json or does not exist
+            # File does not contain valid json
             print(f"Invalid file: {fpath}")
             raise
         except FileNotFoundError:
