@@ -1,8 +1,5 @@
 [
     {
-        "file_type": "flashcard_topic_file"
-    },
-    {
         "topic_name": "New file test topic",
         "prompts": [
             {
