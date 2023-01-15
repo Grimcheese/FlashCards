@@ -43,14 +43,14 @@ def get_files(directory, extension=True, find_json=True, blacklist=[], whitelist
     found_files = []
     for file in directory.iterdir():
         fname = Path(file).name
-
+        print(fname)
         if find_json:
             try:
-                JSONTopicHandler(file)
-
                 if file.suffix != ".json":
                     continue
-            except json.decoder.JSONDecodeError:
+
+                JSONTopicHandler(file)
+            except (json.decoder.JSONDecodeError):
                 continue
 
         if file.is_dir():

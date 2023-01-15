@@ -19,13 +19,16 @@ def get_files_test():
         directory = Path(Path.cwd())
         flist = handle_json.get_files(directory, extension=True)
 
-        actual_files = []
+        actual_files = ["validate_file.json"]
         print(f"Returned: {flist}")
         print(f"Comparing to {actual_files}")
 
         assert flist == actual_files
     except AssertionError:
         print("FAILURE: get_files_test failed")
+        return
+
+    print("SUCCESS: get_files_test succeeded")
 
 
 if __name__ == "__main__":
