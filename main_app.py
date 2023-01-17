@@ -400,16 +400,25 @@ class DisplayPrompts(BasicFrame):
             main_app: The main window which the program is contained within.
         """
 
+        # Create frames to separate widgets
+        self.header_frame = ttk.Frame(master=self.base_frame)
+        self.header_frame.grid(column=0, row=0, sticky=tk.W)
+
+        self.main_frame = ttk.Frame(master=self.base_frame)
+        self.main_frame.grid(column=0, row=2)
+
+        # Header widgets
         self.return_to_start_button = ttk.Button(
-            master=self.base_frame,
+            master=self.header_frame,
             text="Return to start screen",
             command=lambda: main_app.update_current_screen(
                 main_app.intro_frame.S_INDEX, main_app.current_screen
             ),
         )
         self.return_to_start_button.grid(column=0, row=0)
+
         self.return_to_topic_select_button = ttk.Button(
-            master=self.base_frame,
+            master=self.header_frame,
             text="Return to topic select",
             command=lambda: main_app.update_current_screen(
                 main_app.topic_select_frame.S_INDEX, main_app.current_screen
@@ -417,34 +426,35 @@ class DisplayPrompts(BasicFrame):
         )
         self.return_to_topic_select_button.grid(column=1, row=0)
 
-        self.top_label = ttk.Label(
-            master=self.base_frame, text="Running through prompts!"
-        )
-        self.top_label.grid(column=2, row=0)
-
         self.back_button = ttk.Button(
-            master=self.base_frame,
+            master=self.header_frame,
             text="Go back a prompt",
             command=self.previous_prompt,
         )
         self.back_button.grid(column=3, row=0)
 
-        self.prompt_label = ttk.Label(
-            master=self.base_frame, text="", width=22, wraplength=100
-        )
-        self.prompt_label.grid(column=2, columnspan=2, row=2)
-        self.answer_label = ttk.Label(master=self.base_frame, text="")
-        self.answer_label.grid(column=3, row=3)
+        self.counter_label = ttk.Label(master=self.header_frame, text="")
+        self.counter_label.grid(column=5, row=0)
+
+        # Labels that contain the prompt and answer
+        self.prompt = ttk.Label(master=self.main_frame, text="Prompt: ")
+        self.prompt.grid(column=0, row=1, sticky=(tk.N, tk.W))
+
+        self.answer = ttk.Label(master=self.main_frame, text="Answer: ")
+        self.answer.grid(column=0, row=2, sticky=(tk.N, tk.W))
+
+        self.prompt_label = ttk.Label(master=self.main_frame, text="", width=40)
+        self.prompt_label.grid(column=1, row=1, sticky=(tk.E, tk.W))
+
+        self.answer_label = ttk.Label(master=self.main_frame, wraplength=600, text="")
+        self.answer_label.grid(column=1, row=2, sticky=(tk.E, tk.W))
 
         self.start_prompts_button = ttk.Button(
-            master=self.base_frame,
+            master=self.header_frame,
             text="Begin running through prompts",
             command=self.show_first_prompt,
         )
         self.start_prompts_button.grid(column=4, row=0)
-
-        self.counter_label = ttk.Label(master=self.base_frame, text="")
-        self.counter_label.grid(column=4, row=0)
 
     def show_first_prompt(self):
         """Display the initial prompt from the randomised list."""
