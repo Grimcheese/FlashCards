@@ -251,6 +251,19 @@
             {
                 "prompt": "What is GPS?",
                 "answer": "Global Positioning System. Technology that utilises satellites in space to find the precise location of a device."
+            },
+            {
+                "prompt": "What are PRL updates?",
+                "answer": "Preferred Roaming List. Allows a phone to connect to the correct tower as it moves through the network."
+            }
+        ]
+    },
+    {
+        "topic_name": "Transfer Speeds",
+        "prompts": [
+            {
+                "prompt": "What max speeds are theorertically possible with 5G technology?",
+                "answer": "10Gbps"
             }
         ]
     }
