@@ -438,15 +438,19 @@ class DisplayPrompts(BasicFrame):
 
         # Labels that contain the prompt and answer
         self.prompt = ttk.Label(master=self.main_frame, text="Prompt: ")
-        self.prompt.grid(column=0, row=1, sticky=(tk.N, tk.W))
+        self.prompt.grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E))
 
         self.answer = ttk.Label(master=self.main_frame, text="Answer: ")
-        self.answer.grid(column=0, row=2, sticky=(tk.N, tk.W))
+        self.answer.grid(column=0, row=2, sticky=(tk.N, tk.W, tk.E))
 
-        self.prompt_label = ttk.Label(master=self.main_frame, text="", width=40)
+        self.prompt_label = ttk.Label(
+            master=self.main_frame, width=700, wraplength=700, text=""
+        )
         self.prompt_label.grid(column=1, row=1, sticky=(tk.E, tk.W))
 
-        self.answer_label = ttk.Label(master=self.main_frame, wraplength=600, text="")
+        self.answer_label = ttk.Label(
+            master=self.main_frame, width=700, wraplength=700, text=""
+        )
         self.answer_label.grid(column=1, row=2, sticky=(tk.E, tk.W))
 
         self.start_prompts_button = ttk.Button(
