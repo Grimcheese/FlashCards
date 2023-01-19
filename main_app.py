@@ -817,7 +817,7 @@ class MainApp:
         self.main_window = parent
         self.current_screen = "intro_frame"
 
-        self.topic_file = JSONTopicHandler(MainApp.default_file_path)
+        # self.topic_file = JSONTopicHandler(MainApp.default_file_path)
 
         self.intro_frame = IntroFrame(self.main_window)
         self.create_topic_frame = CreateTopicFrame(self)

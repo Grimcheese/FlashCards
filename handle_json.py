@@ -135,6 +135,7 @@ class JSONHandler:
 
     @classmethod
     def get_js(cls, fpath):
+        data = None
         try:
             with open(fpath, "r") as f:
                 data = json.load(f)
@@ -142,10 +143,8 @@ class JSONHandler:
         except json.JSONDecodeError:
             # File does not contain valid json
             print(f"Invalid file: {fpath}")
-            raise
         except FileNotFoundError:
             print(f"File not found. Make one.")
-            raise
 
         return data
 
