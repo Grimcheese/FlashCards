@@ -72,16 +72,11 @@ class IntroFrame(BasicFrame):
         self.build_intro_screen()
 
     def build_intro_screen(self):
-        """Define and place the widgets for the intro screen.
-
-        Reads the label to be displayed from a JSON file called gui_reference.json
-        """
-
-        gui_reference_data = JSONHandler.get_js("gui_reference.json")
+        """Define and place the widgets for the intro screen."""
 
         self.intro_label = ttk.Label(
             master=self.base_frame,
-            text=gui_reference_data["intro_frame"][0]["main_text"],
+            text="Welcome to FlashCards! FlashCards is an interactive study aid. You can press any key to continue to topic selection!",
         )
         self.intro_label.grid(column=0, row=0)
 
@@ -137,9 +132,10 @@ class ChooseFileFrame(BasicFrame):
             ),
         )
         self.previous_frame_button.grid(column=0, row=0)
+
         self.next_frame_button = ttk.Button(
             master=self.base_frame,
-            text="Choose: '" + main_app.topic_file.get_name() + "'",
+            text="None chosen",
             command=lambda: self.to_topic_select(main_app),
             width=25,
         )
@@ -172,8 +168,15 @@ class ChooseFileFrame(BasicFrame):
         rsrc_dir = Path(MainApp.CWD, MainApp.RESOURCES_DIR)
 
         file_index = 0
-        for file in rsrc_dir.iterdir():
+
+        valid_files = handle_json.get_files(Path(MainApp.RESOURCES_DIR))
+        print(valid_files)
+
+        for file in valid_files:
             # Check each file supports FlashCards format
+            file = Path.joinpath(Path.cwd(), Path(MainApp.RESOURCES_DIR), file)
+            print(f"Trying: {file}")
+
             try:
                 self.found_files.append(JSONTopicHandler(file))
                 self.found_files.append(file)
@@ -189,7 +192,7 @@ class ChooseFileFrame(BasicFrame):
                 self.files_display[file_index].grid(column=0, row=file_index + 2)
 
                 file_index += 1
-            except json.decoder.JSONDecodeError:
+            except (json.decoder.JSONDecodeError, TypeError):
                 print("Not a valid FlashCards file")
 
     def pick_file(self, f_path):
@@ -817,7 +820,7 @@ class MainApp:
         self.main_window = parent
         self.current_screen = "intro_frame"
 
-        # self.topic_file = JSONTopicHandler(MainApp.default_file_path)
+        self.topic_file = None
 
         self.intro_frame = IntroFrame(self.main_window)
         self.create_topic_frame = CreateTopicFrame(self)
