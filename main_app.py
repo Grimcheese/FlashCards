@@ -138,6 +138,7 @@ class ChooseFileFrame(BasicFrame):
             text="None chosen",
             command=lambda: self.to_topic_select(main_app),
             width=25,
+            state="disabled",
         )
         self.next_frame_button.grid(column=1, row=0)
 
@@ -206,6 +207,7 @@ class ChooseFileFrame(BasicFrame):
         print("Picking file: " + new_file.get_name())
 
         self.next_frame_button.config(text="Choose: '" + new_file.get_name() + "'")
+        self.next_frame_button["state"] = tk.ACTIVE
 
 
 class TopicSelectFrame(BasicFrame):
@@ -288,22 +290,29 @@ class TopicSelectFrame(BasicFrame):
                 widgets for this frame on the grid correctly."""
 
         topic_row = 1
-        for topic in self.topic_file.topics:
-            self.topic_buttons.append(
-                ttk.Button(
-                    master=self.base_frame,
-                    text=topic,
-                    width=20,
-                    command=lambda topic=topic: self.pick_topics(topic),
+        try:
+            for topic in self.topic_file.topics:
+                self.topic_buttons.append(
+                    ttk.Button(
+                        master=self.base_frame,
+                        text=topic,
+                        width=20,
+                        command=lambda topic=topic: self.pick_topics(topic),
+                    )
                 )
-            )
 
-            self.chosen_topic_labels.append(ttk.Label(master=self.base_frame, text=""))
-            self.update_picked_topics_label(topic)
+                self.chosen_topic_labels.append(
+                    ttk.Label(master=self.base_frame, text="")
+                )
+                self.update_picked_topics_label(topic)
 
-            self.topic_buttons[topic_row - 1].grid(column=1, row=topic_row, sticky=tk.W)
-            self.chosen_topic_labels[topic_row - 1].grid(column=2, row=topic_row)
-            topic_row += 1
+                self.topic_buttons[topic_row - 1].grid(
+                    column=1, row=topic_row, sticky=tk.W
+                )
+                self.chosen_topic_labels[topic_row - 1].grid(column=2, row=topic_row)
+                topic_row += 1
+        except AttributeError:
+            print("No file found while attempting to create topic select.")
 
         return topic_row
 
@@ -887,7 +896,7 @@ class MainApp:
         del self.display_prompts_frame
         del self.topic_file
 
-        self.topic_file = JSONTopicHandler(MainApp.default_file_path)
+        self.topic_file = None
         self.choose_file_frame = ChooseFileFrame(self)
         self.topic_select_frame = TopicSelectFrame(self)
         self.display_prompts_frame = DisplayPrompts(self)
