@@ -69,6 +69,20 @@ def get_files(directory, extension=True, find_json=True, blacklist=[], whitelist
     return found_files
 
 
+def is_valid_file(fpath):
+    """Check that a given file is a valid FlashCards file.
+
+    Args:
+        fpath: The absolute filepath of the file to check.
+    """
+
+    # Check file is valid json
+
+    # Check for file header obj
+
+    # Check file contains FlashCard topics and prompts
+
+
 class InvalidFlashCardFile(Exception):
     """An invalid file has been used to create a JSONTopicFile object.
 
