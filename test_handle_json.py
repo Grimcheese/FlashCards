@@ -17,7 +17,7 @@ tested = []
 
 
 def get_files_test():
-    """Test get_files method."""
+    """Test get_files function."""
 
     name = "get_files()"
     tested.append(name)
@@ -41,6 +41,31 @@ def get_files_test():
         print(e)
         failed.append(name)
         raise
+
+
+def is_valid_file_test():
+    """Test is_valid_file function."""
+
+    # Test valid file
+    name = "is_valid_file() - valid file"
+    tested.append(name)
+
+    try:
+        valid_file = "validate_file.json"
+        assert handle_json.is_valid_file(valid_file) == True
+    except AssertionError:
+        print(f"FAILURE: {name} failed")
+        failed.append(name)
+
+    # Test invalid file
+    name = "is_valid_file() - invalid file"
+    tested.append(name)
+    try:
+        invalid_file = "invalidate_file.json"
+        assert handle_json.is_valid_file(invalid_file) == False
+    except AssertionError:
+        print(f"FAILURE: {name} failed")
+        failed.append(name)
 
 
 def JSONHandler_test():
@@ -93,5 +118,6 @@ if __name__ == "__main__":
     print("Starting handle_json.py test file...")
     get_files_test()
     JSONHandler_test()
+    is_valid_file_test()
 
     results()
