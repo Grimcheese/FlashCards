@@ -69,18 +69,43 @@ def get_files(directory, extension=True, find_json=True, blacklist=[], whitelist
     return found_files
 
 
-def is_valid_file(fpath):
+def is_valid_file(filename):
     """Check that a given file is a valid FlashCards file.
 
     Args:
-        fpath: The absolute filepath of the file to check.
+        filename: The absolute filepath of the file to check as a string.
+
+    Return: Boolean value - true for valid, false for invalid.
     """
 
+    fpath = Path(filename)
+    # Check that file exists
+    if not Path.exists(fpath):
+        print(f"{fpath} does not exist.")
+        return False
+
     # Check file is valid json
+    if JSONHandler.get_js(fpath) == None:
+        return False
 
     # Check for file header obj
+    raw_json = JSONHandler.get_js(fpath)
 
     # Check file contains FlashCard topics and prompts
+
+    return True
+
+
+class InvalidJSONFile(Exception):
+    """An invalid JSON file has been used to create a JSONHandler object.
+
+    Extends the Exception class
+    """
+
+    def __init__(self, message):
+        """Initialise exception object with a message to describe the error."""
+
+        super().__init__(message)
 
 
 class InvalidFlashCardFile(Exception):
@@ -154,11 +179,13 @@ class JSONHandler:
             with open(fpath, "r") as f:
                 data = json.load(f)
 
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
             # File does not contain valid json
-            print(f"Invalid file: {fpath}")
+            message = f"Invalid file: {fpath}"
+            raise InvalidJSONFile(message) from e
         except FileNotFoundError:
             print(f"File not found. Make one.")
+            raise
 
         return data
 
