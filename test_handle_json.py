@@ -28,7 +28,11 @@ def get_files_test():
         directory = Path(Path.cwd())
         flist = handle_json.get_files(directory, extension=True)
 
-        actual_files = ["invalidate_file.json", "validate_file.json"]
+        actual_files = [
+            "invalidate_file.json",
+            "not_valid_json.json",
+            "validate_file.json",
+        ]
         print(f"Returned: {flist}")
         print(f"Comparing to {actual_files}")
 
@@ -69,34 +73,41 @@ def is_valid_file_test():
 
 
 def JSONHandler_test():
-    """Test JSONHandler class."""
+    """Test JSONHandler class. Note that JSONHandler is tested only
+    for json file types - not FlashCard json files.
+    """
 
     name = "JSONHandler"
-    print("Testing JSONHandler class")
+    print("Testing JSONHandler class...")
     tested.append(name)
+
+    valid_files = "validate_file.json"
+    invalid_files = ["README.md", "not_valid_json.json"]
 
     # Valid json file test
     valid_flashcard_file = "validate_file.json"
     file_obj1 = handle_json.JSONHandler(valid_flashcard_file)
 
     # Invalid, non-json file test
-    try:
-        invalid_flashcard_file = "README.md"
-        file_obj2 = handle_json.JSONHandler(invalid_flashcard_file)
+    invalid_objects = []
+    for file in invalid_files:
+        print(f"\tJSONHandler: Trying invalid file: {file}")
+        try:
+            invalid_objects.append(handle_json.JSONHandler(file))
 
-        # Should not get here - exception should be raised
+            # Should not get here - exception should be raised
+            print(
+                "\tJSONHandler_test: invalid file has instantiated with no except raised."
+            )
+        except handle_json.InvalidJSONFile as e:
+            print(
+                "\tJSONHandler_test: Correctly raised exception for non json or invalid json file."
+            )
+
+    if len(invalid_objects) > 0:
         failed.append(name)
-    except json.JSONDecodeError:
-        print("Correctly raised exception for non json file.")
-        """
-    # Invalid, json file test
-    try:
-        invalid_json_file = "invalidate_file.json"
-        file_obj3 = handle_json.JSONHandler(invalid_json_file)
-        
-        failed.append(name)
-    except 
-    """
+    else:
+        print("\tJSONHandler_test: success!")
 
 
 def results():
