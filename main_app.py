@@ -50,6 +50,29 @@ class BasicFrame:
     def remove(self):
         self.base_frame.grid_remove()
 
+    def get_valid_files(self, dir):
+        """Get a list of valid FlashCards files from a directory.
+        
+        Args: 
+            dir: The directory to search. This directory is relative to 
+                the location of this main_app file.
+            
+        Returns: The list of validated FlashCards files.
+        """
+
+        prog_dir = Path.resolve("__name__")
+        search_dir = prog_dir.joinpath(Path(dir))
+        initial_list = handle_json.get_files(search_dir)
+
+        final_list = []
+        for file in initial_list:
+            try:
+                final_list.append(JSONHandler(file))
+            except handle_json.InvalidJSONFile:
+                print(f"{file} is not a valid FlashCards file.")
+
+        return final_list
+
 
 class IntroFrame(BasicFrame):
     """The intro screen to be displayed to the user on program start.
@@ -612,6 +635,7 @@ class CreateTopicFrame(BasicFrame):
         self.files_label.grid(column=1, row=3)
 
         files = handle_json.get_files(Path(Path.cwd(), "resources"))
+        valid_files = 
         files_var = tk.StringVar(value=files)
 
         self.topics_label = ttk.Label(self.file_select_frame, text="Topics")
