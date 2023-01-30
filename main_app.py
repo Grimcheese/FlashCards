@@ -166,14 +166,12 @@ class ChooseFileFrame(BasicFrame):
     def show_files(self):
         """Display a list of files that can be used as button widgets."""
 
-        rsrc_dir = Path(MainApp.CWD, MainApp.RESOURCES_DIR)
-
+        # Get the files in resources directory
         file_index = 0
+        files_in_dir = handle_json.get_files(Path(MainApp.RESOURCES_DIR))
+        print(f"Files in dir: {files_in_dir}")
 
-        valid_files = handle_json.get_files(Path(MainApp.RESOURCES_DIR))
-        print(valid_files)
-
-        for file in valid_files:
+        for file in files_in_dir:
             # Check each file supports FlashCards format
             file = Path.joinpath(Path.cwd(), Path(MainApp.RESOURCES_DIR), file)
             print(f"Trying: {file}")
@@ -193,8 +191,8 @@ class ChooseFileFrame(BasicFrame):
                 self.files_display[file_index].grid(column=0, row=file_index + 2)
 
                 file_index += 1
-            except (json.decoder.JSONDecodeError, TypeError):
-                print("Not a valid FlashCards file")
+            except (handle_json.InvalidJSONFile):
+                print(f"{file} is not a valid FlashCards file")
 
     def pick_file(self, f_path):
         """Select the file after button press and update widgets on the frame.
