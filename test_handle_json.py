@@ -23,7 +23,7 @@ def get_files_test():
     tested.append(name)
 
     try:
-        print("Testing get_files(dir)")
+        print("Testing get_files(dir)...")
 
         directory = Path(Path.cwd())
         flist = handle_json.get_files(directory, extension=True)
@@ -33,8 +33,8 @@ def get_files_test():
             "not_valid_json.json",
             "validate_file.json",
         ]
-        print(f"Returned: {flist}")
-        print(f"Comparing to {actual_files}")
+        print(f"\tReturned: {flist}")
+        print(f"\tComparing to {actual_files}")
 
         assert flist == actual_files
     except AssertionError:
@@ -50,25 +50,29 @@ def get_files_test():
 def is_valid_file_test():
     """Test is_valid_file function."""
 
+    print("Testing is_valid_file()...")
+
     # Test valid file
     name = "is_valid_file() - valid file"
     tested.append(name)
 
     try:
+        print("\tUsing a valid file.")
         valid_file = "validate_file.json"
         assert handle_json.is_valid_file(valid_file) == True
     except AssertionError:
-        print(f"FAILURE: {name} failed")
+        print(f"\tFAILURE: {name} failed")
         failed.append(name)
 
     # Test invalid file
     name = "is_valid_file() - invalid file"
     tested.append(name)
     try:
+        print("\tUsing an invalid file.")
         invalid_file = "invalidate_file.json"
         assert handle_json.is_valid_file(invalid_file) == False
     except AssertionError:
-        print(f"FAILURE: {name} failed")
+        print(f"\tFAILURE: {name} failed")
         failed.append(name)
 
 
@@ -91,23 +95,19 @@ def JSONHandler_test():
     # Invalid, non-json file test
     invalid_objects = []
     for file in invalid_files:
-        print(f"\tJSONHandler: Trying invalid file: {file}")
+        print(f"\tTrying invalid file: {file}")
         try:
             invalid_objects.append(handle_json.JSONHandler(file))
 
             # Should not get here - exception should be raised
-            print(
-                "\tJSONHandler_test: invalid file has instantiated with no except raised."
-            )
+            print("\tInvalid file has instantiated with no except raised.")
         except handle_json.InvalidJSONFile as e:
-            print(
-                "\tJSONHandler_test: Correctly raised exception for non json or invalid json file."
-            )
+            print("\tCorrectly raised exception for non json or invalid json file.")
 
     if len(invalid_objects) > 0:
         failed.append(name)
     else:
-        print("\tJSONHandler_test: success!")
+        print("\tSuccess!")
 
 
 def results():
