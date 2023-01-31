@@ -52,17 +52,19 @@ class BasicFrame:
 
     def get_valid_files(self, dir):
         """Get a list of valid FlashCards files from a directory.
-        
-        Args: 
-            dir: The directory to search. This directory is relative to 
+
+        Args:
+            dir: The directory to search. This directory is relative to
                 the location of this main_app file.
-            
+
         Returns: The list of validated FlashCards files.
         """
 
-        prog_dir = Path.resolve("__name__")
+        prog_dir = Path(__file__).resolve().parent
         search_dir = prog_dir.joinpath(Path(dir))
         initial_list = handle_json.get_files(search_dir)
+
+        print(initial_list)
 
         final_list = []
         for file in initial_list:
@@ -71,6 +73,7 @@ class BasicFrame:
             except handle_json.InvalidJSONFile:
                 print(f"{file} is not a valid FlashCards file.")
 
+        print(final_list)
         return final_list
 
 
@@ -196,7 +199,7 @@ class ChooseFileFrame(BasicFrame):
 
         for file in files_in_dir:
             # Check each file supports FlashCards format
-            file = Path.joinpath(Path.cwd(), Path(MainApp.RESOURCES_DIR), file)
+            # file = Path.joinpath(Path.cwd(), Path(MainApp.RESOURCES_DIR), file)
             print(f"Trying: {file}")
 
             try:
@@ -634,9 +637,11 @@ class CreateTopicFrame(BasicFrame):
         self.files_label = ttk.Label(self.file_select_frame, text="Files")
         self.files_label.grid(column=1, row=3)
 
-        files = handle_json.get_files(Path(Path.cwd(), "resources"))
-        valid_files = 
-        files_var = tk.StringVar(value=files)
+        # files = handle_json.get_files(Path(Path.cwd(), "resources"))
+
+        valid_files = self.get_valid_files(main_app.RESOURCES_DIR)
+
+        files_var = tk.StringVar(value=valid_files)
 
         self.topics_label = ttk.Label(self.file_select_frame, text="Topics")
         self.topics_label.grid(column=3, row=3)
