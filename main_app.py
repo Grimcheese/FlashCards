@@ -640,6 +640,7 @@ class CreateTopicFrame(BasicFrame):
         # files = handle_json.get_files(Path(Path.cwd(), "resources"))
 
         valid_files = self.get_valid_files(main_app.RESOURCES_DIR)
+        print(f"Showing valid files: {valid_files}")
 
         files_var = tk.StringVar(value=valid_files)
 
@@ -732,8 +733,8 @@ class CreateTopicFrame(BasicFrame):
         try:
             # Select chosen file from files in resources directory
             file_index = file_index[0]  # Only interested in first element of tuple
-            files = handle_json.get_files(Path(Path.cwd(), "resources"))
-            chosen_file = files[file_index]
+            files = self.get_valid_files("resources")
+            chosen_file = files[file_index].fpath
 
             # Find topics from file
             fpath = Path.joinpath(Path.cwd(), "resources", chosen_file)
