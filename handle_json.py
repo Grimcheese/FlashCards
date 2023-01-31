@@ -37,11 +37,15 @@ def get_files(directory, extension=True, find_json=True, blacklist=[], whitelist
 
     Returns:
         A list containing all the files in the specified directory
-            modified according to any flags passed as arguments
+            modified according to any flags passed as arguments. The
+            files are stored as a path to that file. The path is absolute
+            or relative depending on what directory was given to this function
+            as an argument.
     """
 
     found_files = []
     for file in directory.iterdir():
+        print(file)
         fname = Path(file).name
         if find_json:
             try:
@@ -64,7 +68,7 @@ def get_files(directory, extension=True, find_json=True, blacklist=[], whitelist
             # Do not want file extension in string
             fname, discard = fname.split(".")
 
-        found_files.append(fname)
+        found_files.append(file)
 
     return found_files
 
@@ -163,6 +167,9 @@ class JSONHandler:
 
         self.raw_string = JSONHandler.get_js(in_filepath)
 
+    def __str__(self):
+        return self.fname
+
     def output_string(self):
         print(self.raw_string)
         print("String loaded from JSON file: " + self.fname)
@@ -184,7 +191,7 @@ class JSONHandler:
             message = f"Invalid file: {fpath}"
             raise InvalidJSONFile(message) from e
         except FileNotFoundError:
-            print(f"File not found. Make one.")
+            print(f"File not found at {fpath}. Make one.")
             raise
 
         return data
