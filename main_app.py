@@ -608,9 +608,17 @@ class CreateTopicFrame(BasicFrame):
             main_app: The parent window the frame sits witin.
         """
 
-        # Frame for contents below the header (self.base_frame)
+        # Frame for the header at the top of window
+        self.header_frame = ttk.Frame(self.base_frame)
+        self.header_frame.grid(column=1, row=0, columnspan=10, sticky=tk.W)
+
+        # Frame for contents below header and above text box
         self.file_select_frame = ttk.Frame(self.base_frame)
-        self.file_select_frame.grid(column=1, row=1)
+        self.file_select_frame.grid(column=1, row=1, columnspan=10, sticky=tk.W)
+
+        # Frame for text box and entry contents
+        self.text_frame = ttk.Frame(self.base_frame)
+        self.text_frame.grid(column=1, row=2, columnspan=10, sticky=tk.W)
 
         self.build_header(main_app)
         self.build_list_boxes(main_app)
@@ -622,20 +630,23 @@ class CreateTopicFrame(BasicFrame):
 
         # Program navigation header buttons
         self.file_select_screen_button = ttk.Button(
-            self.base_frame,
+            self.header_frame,
             text="File Select Screen",
             command=lambda: main_app.update_current_screen(
                 main_app.choose_file_frame.S_INDEX, main_app.current_screen
             ),
         )
-        self.file_select_screen_button.grid(column=1, row=0)
+        self.file_select_screen_button.grid(padx=(10, 0), column=1, row=0, sticky=tk.W)
+
+        self.new_file_button = ttk.Button(self.header_frame, text="Create new file")
+        self.new_file_button.grid(column=2, row=0, sticky=tk.W)
 
     def build_list_boxes(self, main_app):
         """Define the list box widgets and the Vars required for them."""
 
         # Choose the file
         self.files_label = ttk.Label(self.file_select_frame, text="Files")
-        self.files_label.grid(column=1, row=3)
+        self.files_label.grid(padx=(10, 0), column=1, row=3)
 
         # files = handle_json.get_files(Path(Path.cwd(), "resources"))
 
@@ -654,7 +665,7 @@ class CreateTopicFrame(BasicFrame):
             height=5,
             exportselection=False,
         )
-        self.file_listbox.grid(column=1, row=4)
+        self.file_listbox.grid(padx=(10, 0), column=1, row=4)
 
         self.list_bar1 = ttk.Scrollbar(
             self.file_select_frame, orient=tk.VERTICAL, command=self.file_listbox.yview
@@ -692,31 +703,31 @@ class CreateTopicFrame(BasicFrame):
 
         # Text field that displays formatted contents of the file/topic
         self.file_text = tk.Text(
-            self.base_frame, state="disabled", width=95, height=20, wrap="word"
+            self.text_frame, state="disabled", width=95, height=20, wrap="word"
         )
-        self.file_text.grid(pady=8, padx=(10, 0), column=1, row=3, columnspan=10)
+        self.file_text.grid(pady=8, padx=(10, 0), column=0, row=1, columnspan=9)
 
         self.text_scrollbar = ttk.Scrollbar(
-            self.base_frame, orient=tk.VERTICAL, command=self.file_text.yview
+            self.text_frame, orient=tk.VERTICAL, command=self.file_text.yview
         )
-        self.text_scrollbar.grid(pady=8, column=11, row=3, sticky=(tk.N, tk.S))
+        self.text_scrollbar.grid(pady=8, column=11, row=1, sticky=(tk.N, tk.S))
         self.file_text.configure(yscrollcommand=self.text_scrollbar.set)
 
     def build_new_topics(self, main_app):
         """Define the new prompt widgets."""
 
         # New prompt and answer submission to the selected file and topic
-        self.prompt_box_label = ttk.Label(self.base_frame, text="New prompt")
-        self.prompt_box_label.grid(column=1, row=5)
+        self.prompt_box_label = ttk.Label(self.text_frame, text="New prompt")
+        self.prompt_box_label.grid(column=0, row=3)
 
-        self.prompt_box = tk.Text(self.base_frame, width=50, height=1, wrap="none")
-        self.prompt_box.grid(column=2, row=5)
+        self.prompt_box = tk.Text(self.text_frame, width=50, height=1, wrap="none")
+        self.prompt_box.grid(column=1, row=3)
 
-        self.answer_box_label = ttk.Label(self.base_frame, text="New answer")
-        self.answer_box_label.grid(column=1, row=6)
+        self.answer_box_label = ttk.Label(self.text_frame, text="New answer")
+        self.answer_box_label.grid(column=0, row=4)
 
-        self.answer_box = tk.Text(self.base_frame, width=50, height=2, wrap="word")
-        self.answer_box.grid(column=2, row=6)
+        self.answer_box = tk.Text(self.text_frame, width=50, height=2, wrap="word")
+        self.answer_box.grid(column=1, row=4)
 
     def display_file(self, file_index):
         """Populate the topics listbox and the text box with selected file's
