@@ -599,6 +599,7 @@ class CreateTopicFrame(BasicFrame):
         super().__init__(main_app.main_window)
 
         self.selected_file = None
+        self.selected_topic = None
         self.build_create_topic_frame(main_app)
 
     def build_create_topic_frame(self, main_app):
@@ -729,6 +730,11 @@ class CreateTopicFrame(BasicFrame):
         self.answer_box = tk.Text(self.text_frame, width=50, height=2, wrap="word")
         self.answer_box.grid(column=1, row=4)
 
+        self.new_prompt_button = ttk.Button(
+            self.text_frame, state="disabled", text="Submit new prompt"
+        )
+        self.new_prompt_button.grid(column=0, row=5)
+
     def display_file(self, file_index):
         """Populate the topics listbox and the text box with selected file's
         contents.
@@ -760,6 +766,10 @@ class CreateTopicFrame(BasicFrame):
 
             # Set Listbox stringvar to list of topics
             self.topics_var.set(self.selected_file.topics)
+
+            # Reset selected topic
+            self.selected_topic = None
+            self.new_prompt_button["state"] = "disabled"
         except ValueError:
             # Handle situation where list box is unselected
             return
@@ -775,16 +785,21 @@ class CreateTopicFrame(BasicFrame):
             topic_index = topic_index[0]
         except ValueError:
             # Handle situation where topic_index will be None (unselected listbox)
+            self.selected_topic = None
+            self.new_prompt_button["state"] = "disabled"
             return
 
-        topic_name = self.selected_file.topics[topic_index]
-        print(f"Selected topic: {topic_name}, max width: {self.file_text['width']}")
+        self.selected_topic = self.selected_file.topics[topic_index]
+        self.new_prompt_button["state"] = "active"
+        print(
+            f"Selected topic: {self.selected_topic}, max width: {self.file_text['width']}"
+        )
 
         # Set text box
         self.file_text.configure(state="normal")
         self.file_text.delete("1.0", "end")
         self.file_text.insert("end", f"{self.selected_file.fname} topic file\n")
-        self.display_formatted_topic(self.selected_file, topic_name)
+        self.display_formatted_topic(self.selected_file, self.selected_topic)
         self.file_text.configure(state="disabled")
 
     def display_formatted_topic(self, file, topic):
